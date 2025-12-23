@@ -131,7 +131,6 @@ def register_callbacks(app):
                 yaxis=dict(showgrid=True, gridcolor='#f1f5f9', zeroline=False),
             )
             
-            # SUCCESS: Charts + Close Toast
             return ev_fmt, eq_fmt, share_price_fmt, fig_waterfall, fig_heatmap, False, "", ""
 
         except Exception as e:
@@ -140,16 +139,5 @@ def register_callbacks(app):
             if hasattr(e, 'errors'): # Pydantic
                  error_msg = "; ".join([err['msg'] for err in e.errors()])
             
-            # Return Empty/No Update for charts, and OPEN the Toast
-            empty_fig = {
-                "layout": {
-                    "xaxis": {"visible": False},
-                    "yaxis": {"visible": False},
-                    "annotations": [{
-                        "text": "Fix errors to see chart",
-                        "xref": "paper", "yref": "paper",
-                        "showarrow": False, "font": {"size": 20}
-                    }]
-                }
-            }
-            return "---", "---", "---", empty_fig, empty_fig, True, "Calculation Error", error_msg
+            # Return no_update for charts (Stability Fix), and OPEN the Toast
+            return "---", "---", "---", no_update, no_update, True, "Calculation Error", error_msg
