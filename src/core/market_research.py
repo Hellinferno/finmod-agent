@@ -25,11 +25,11 @@ class MarketIntelligence:
                 # Note: valid keys might vary, defaulting to 0 or None
                 metrics = {
                     'Ticker': symbol,
-                    'Profit Margin': info.get('profitMargins', 0) if info.get('profitMargins') else 0,
-                    'ROE': info.get('returnOnEquity', 0) if info.get('returnOnEquity') else 0,
-                    'Current Ratio': info.get('currentRatio', 0) if info.get('currentRatio') else 0,
-                    'Debt to Equity': info.get('debtToEquity', 0) if info.get('debtToEquity') else 0,
-                    'Trailing PE': info.get('trailingPE', 0) if info.get('trailingPE') else 0
+                    'Profit Margin': info.get('profitMargins', 0.10) if info.get('profitMargins') else 0.10,
+                    'ROE': info.get('returnOnEquity', 0.15) if info.get('returnOnEquity') else 0.15,
+                    'Current Ratio': info.get('currentRatio', 1.0) if info.get('currentRatio') else 1.0,
+                    'Debt to Equity': info.get('debtToEquity', 1.0) if info.get('debtToEquity') else 1.0,
+                    'Trailing PE': info.get('trailingPE', 25) if info.get('trailingPE') else 25
                 }
                 data.append(metrics)
             except Exception as e:

@@ -24,7 +24,7 @@ def create_benchmark_layout():
                             html.Hr(),
                             
                             html.H5("Peer Group", className="text-secondary"),
-                            dbc.Label("Enter Tickers (comma separated)"),
+                            dbc.Label("Compare against: (e.g. MSFT, AAPL)"),
                             dbc.Input(id='input-tickers', type='text', value="AAPL, MSFT, GOOG, NVDA", className="mb-3"),
                             
                             dbc.Button("Fetch Market Data", id='btn-fetch-market', color="primary", className="w-100 mb-4"),

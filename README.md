@@ -3,6 +3,12 @@
 ## Overview
 A Python-based financial modeling tool capable of performing DCF Valuation and Sensitivity Analysis with vector-based performance.
 
+## 🚀 Quick Start
+1. **Download Sample Data:** [Click here to download sample.csv](data/sample_data.csv)
+2. **Launch App:** Click the [Live Demo](YOUR_RENDER_URL)
+3. **Upload:** Go to the "Forecasting" tab and drop the CSV.
+4. **See Magic:** Watch the AI generate the fan chart instantly.
+
 ## Architecture
 This project follows a strict MVC (Model-View-Controller) pattern to ensure scalability and maintainability:
 - **Model (`src/models`)**: Defines data structures and strict validation rules using Pydantic.
