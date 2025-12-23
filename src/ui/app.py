@@ -14,6 +14,11 @@ from src.ui.forecast_callbacks import register_forecast_callbacks
 from src.ui.liquidity_callbacks import register_liquidity_callbacks
 from src.ui.benchmark_callbacks import register_benchmark_callbacks
 from src.core.market_data import get_market_benchmark
+from src.core.database import init_db, save_scenario, load_scenarios
+from dash import State
+
+# Create the database file locally (or connect to cloud)
+init_db()
 
 
 # Initialize App with Bootstrap Theme
@@ -90,6 +95,59 @@ register_budget_callbacks(app)
 register_forecast_callbacks(app)
 register_liquidity_callbacks(app)
 register_benchmark_callbacks(app)
+
+# ---------------------------------------------------------
+# CALLBACK: Save Scenario
+# ---------------------------------------------------------
+@app.callback(
+    Output("save-status", "children"),
+    Input("btn-save", "n_clicks"),
+    State("save-name", "value"),
+    State("input-wacc", "value"),        # Corrected ID from layout.py
+    State("input-term-growth", "value"),      # Corrected ID from layout.py
+    State("input-cashflows", "value"),   # Corrected ID from layout.py
+    prevent_initial_call=True
+)
+def save_to_db(n_clicks, name, wacc, growth, cash_flows):
+    if not name:
+        return "⚠️ Name required."
+    return save_scenario(name, wacc, growth, cash_flows)
+
+# ---------------------------------------------------------
+# CALLBACK: Update Dropdown List
+# ---------------------------------------------------------
+@app.callback(
+    Output("load-dropdown", "options"),
+    Input("save-status", "children"), # Refresh list whenever we save
+    Input("url", "pathname")          # Refresh list when page loads
+)
+def update_dropdown(save_msg, pathname):
+    scenarios = load_scenarios()
+    # Create list for dropdown: [{'label': 'Name', 'value': 'ID'}]
+    return [{'label': s.name, 'value': s.id} for s in scenarios]
+
+# ---------------------------------------------------------
+# CALLBACK: Load Data into Inputs
+# ---------------------------------------------------------
+@app.callback(
+    [Output("input-wacc", "value"),          # Corrected to match layout
+     Output("input-term-growth", "value"),   # Corrected to match layout
+     Output("input-cashflows", "value")],    # Corrected to match layout
+    Input("btn-load", "n_clicks"),
+    State("load-dropdown", "value"),
+    prevent_initial_call=True
+)
+def load_from_db(n_clicks, selected_id):
+    if not selected_id:
+        return dash.no_update
+
+    # Fetch directly (in a real app, optimize this, but this is fine for MVP)
+    scenarios = load_scenarios()
+    target = next((s for s in scenarios if s.id == selected_id), None)
+
+    if target:
+        return target.wacc, target.growth_rate, target.cash_flows
+    return dash.no_update
 
 # Expose server for gunicorn
 server = app.server

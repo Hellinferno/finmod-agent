@@ -32,6 +32,29 @@ def create_layout():
                             dbc.Label("Free Cash Flows (CSV String)"),
                             dbc.Input(id='input-cashflows', value="100,120,140,160,180", type='text', className="mb-4", placeholder="e.g. 1000, 1200, 1450, 1600, 1800"),
                             
+                            
+                            # Scenario Manager
+                            dbc.Card([
+                                dbc.CardHeader("💾 Scenario Manager"),
+                                dbc.CardBody([
+                                    # SAVE SECTION
+                                    dbc.Input(id="save-name", placeholder="Scenario Name (e.g. Bull Case)", type="text", size="sm"),
+                                    dbc.Button("Save Current Model", id="btn-save", color="secondary", size="sm", className="mt-2 w-100"),
+                                    html.Div(id="save-status", className="text-success small mt-1"),
+                                    
+                                    html.Hr(),
+                                    
+                                    # LOAD SECTION
+                                    html.Label("Load Past Model:", className="small"),
+                                    dcc.Dropdown(
+                                        id="load-dropdown",
+                                        placeholder="Select a saved scenario...",
+                                        style={'color': 'black'} # Fixes dark mode visibility
+                                    ),
+                                    dbc.Button("Load Selected", id="btn-load", color="info", size="sm", className="mt-2 w-100 outline")
+                                ])
+                            ], className="mb-4 border-secondary"),
+
                             # Action
                             dbc.Button("Calculate Model", id='btn-calculate', color="primary", className="w-100 mt-3"),
                             
