@@ -1,5 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+from src.core.agent_logic import generate_cfo_insights
 
 def create_liquidity_layout():
     return dbc.Container(
@@ -100,6 +101,22 @@ def create_liquidity_layout():
                         ],
                         width=9,
                         className="p-4"
+                    ),
+                    
+                    # AI Insight Card (Full Width at Bottom)
+                    dbc.Col(
+                        dbc.Card([
+                            dbc.CardHeader("🤖 AI CFO Commentary"),
+                            dbc.CardBody([
+                                dcc.Markdown(
+                                    id='cfo-insight-box',
+                                    children="Waiting for data analysis...", 
+                                    style={'fontSize': '16px'}
+                                )
+                            ])
+                        ], className="mb-4 mt-4 shadow-lg border-info"),
+                        width=12,
+                        className="px-4"
                     )
                 ]
             )

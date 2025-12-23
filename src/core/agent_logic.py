@@ -1,21 +1,34 @@
 
-def generate_cfo_commentary(runway_months, profit_margin, variance_percent):
+def generate_cfo_insights(metrics):
     """
-    Simulates an AI Agent reasoning about the financials.
+    Analyzes financial metrics and generates a 'CFO Commentary'.
+    Input: metrics (dict) -> {'runway': 5.2, 'burn': -2000, 'growth': 0.15}
     """
+    runway = metrics.get('runway', 0)
+    burn = metrics.get('burn', 0)
+    growth = metrics.get('growth', 0)
+    
     insights = []
     
-    # 1. Perception (Ingest Data) & Reasoning (Analyze)
-    if runway_months < 3:
-        insights.append(f"⚠️ **CRITICAL:** Cash Runway is only {runway_months:.1f} months. Immediate capital injection or cost-cutting required.")
-    elif runway_months > 12:
-        insights.append(f"✅ **Healthy:** Strong cash position ({runway_months:.1f} months). Consider reinvesting in R&D.")
-        
-    if variance_percent < -10:
-        insights.append(f"📉 **Budget Alert:** Spending is {abs(variance_percent)}% higher than planned. Review 'Marketing' and 'Server' costs.")
-        
-    if profit_margin < 0.10:
-        insights.append("💡 **Strategy:** Net margins are thin (<10%). Focus on high-margin products or raise prices.")
+    # 1. RUNWAY ANALYSIS (Survival Logic)
+    if runway < 3:
+        insights.append(f"🔴 **CRITICAL DANGER:** Cash runway is only {runway:.1f} months. You must cut costs or raise capital immediately.")
+    elif runway < 6:
+        insights.append(f"⚠️ **WARNING:** Cash runway is {runway:.1f} months. Start fundraising conversations now.")
+    else:
+        insights.append(f"✅ **HEALTHY:** Strong cash position ({runway:.1f} months). You have room to invest in growth.")
 
-    # 2. Action (Output)
+    # 2. BURN RATE ANALYSIS (Efficiency Logic)
+    if burn > 50000 and growth < 0.10:
+        insights.append(f"📉 **EFFICIENCY ALERT:** You are burning ${burn:,.0f}/mo but only growing {growth*100:.1f}%. Review marketing spend.")
+    elif growth > 0.20:
+        insights.append(f"🚀 **HIGH GROWTH:** Growing at {growth*100:.1f}% monthly. Current burn rate is justified.")
+
+    # 3. STRATEGIC ADVICE
+    if runway > 12 and growth < 0.05:
+        insights.append("💡 **CFO ADVICE:** You are too conservative. Use your cash pile to hire sales staff or acquire a competitor.")
+
+    if not insights:
+        insights.append("ℹ️ **STATUS:** Financials look stable. No immediate alerts.")
+
     return "\n\n".join(insights)

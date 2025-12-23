@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from src.core.treasury import TreasuryEngine
+from src.core.agent_logic import generate_cfo_insights
 
 def register_liquidity_callbacks(app):
     
@@ -13,7 +14,8 @@ def register_liquidity_callbacks(app):
          Output('card-dio', 'children'),
          Output('card-dpo', 'children'),
          Output('card-ccc', 'children'),
-         Output('waterfall-liquidity', 'figure')],
+         Output('waterfall-liquidity', 'figure'),
+         Output('cfo-insight-box', 'children')],
         [Input('btn-refresh-liquidity', 'n_clicks'),
          Input('input-net-burn', 'value')]
     )
@@ -118,5 +120,16 @@ def register_liquidity_callbacks(app):
              template="plotly_dark",
              waterfallgap = 0.3
         )
+
+        # 6. Generate AI Insights
+        # Use abs() for burn because the Insight Engine expects positive burn rate for comparison (or handle sign)
+        # Actually logic says: if burn > 50000 (positive number implying spend).
+        # Our net_burn input is negative (-50000). So we pass abs(net_burn).
         
-        return fig_gauge, dso_txt, dio_txt, dpo_txt, ccc_txt, fig_waterfall
+        insight_text = generate_cfo_insights({
+            'runway': runway_months if runway_months != float('inf') else 99,
+            'burn': abs(net_burn),
+            'growth': 0.15 # Hardcoded for now
+        })
+        
+        return fig_gauge, dso_txt, dio_txt, dpo_txt, ccc_txt, fig_waterfall, insight_text
