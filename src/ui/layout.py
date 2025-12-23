@@ -30,7 +30,7 @@ def create_layout():
                             # Input Group 2: Financials
                             html.H5("Financials", className="mt-4 mb-3"),
                             dbc.Label("Free Cash Flows (CSV String)"),
-                            dbc.Input(id='input-cashflows', value="100,120,140,160,180", type='text', className="mb-4", placeholder="e.g. 100,120,140..."),
+                            dbc.Input(id='input-cashflows', value="100,120,140,160,180", type='text', className="mb-4", placeholder="e.g. 1000, 1200, 1450, 1600, 1800"),
                             
                             # Action
                             dbc.Button("Calculate Model", id='btn-calculate', color="primary", className="w-100 mt-3"),

@@ -1,6 +1,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html, Input, Output
+from src.ui import home_layout
 from src.ui.layout import create_layout as create_valuation_layout
 from src.ui.budget_layout import create_budget_layout
 from src.ui.capital_layout import create_capital_layout
@@ -13,6 +14,7 @@ from src.ui.forecast_callbacks import register_forecast_callbacks
 from src.ui.liquidity_callbacks import register_liquidity_callbacks
 from src.ui.benchmark_callbacks import register_benchmark_callbacks
 from src.core.market_data import get_market_benchmark
+
 
 # Initialize App with Bootstrap Theme
 from dotenv import load_dotenv
@@ -72,25 +74,15 @@ app.layout = html.Div(
 )
 
 # Routing Callback
-@app.callback(
-    Output('page-content', 'children'),
-    [Input('url', 'pathname')]
-)
+@app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/budgeting':
-        return create_budget_layout()
-    elif pathname == '/capital' or pathname == '/capital-budgeting':
-        return create_capital_layout()
-    elif pathname == '/forecasting' or pathname == '/forecast':
-        return create_forecast_layout()
-    elif pathname == '/liquidity':
-        return create_liquidity_layout()
-    elif pathname == '/benchmarking' or pathname == '/benchmark':
-        return create_benchmark_layout()
-    elif pathname == '/valuation' or pathname == '/':
+    if pathname == '/valuation':
         return create_valuation_layout()
+    elif pathname == '/budget':
+        return create_budget_layout()
+    # IF pathname is '/' (root) or anything else, show Home Page
     else:
-        return html.H1("404: Page Not Found", className="text-danger text-center my-5")
+        return home_layout.layout
 
 # Register Callbacks
 register_valuation_callbacks(app)
