@@ -15,6 +15,9 @@ from src.ui.benchmark_callbacks import register_benchmark_callbacks
 from src.core.market_data import get_market_benchmark
 
 # Initialize App with Bootstrap Theme
+from dotenv import load_dotenv
+load_dotenv()
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY], suppress_callback_exceptions=True)
 app.title = "FinMod Enterprise Engine"
 

@@ -15,4 +15,5 @@ openpyxl
 requests
 numpy-financial
 google-generativeai
+python-dotenv
 
