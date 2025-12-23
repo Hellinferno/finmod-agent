@@ -12,7 +12,12 @@ FinMod AI replaces the Junior Analyst. Instead of static Excel sheets, it uses *
 1.  **🤖 Think:** An embedded **AI Agent** analyzes runway/burn rate and generates text-based strategic advice (e.g., "Critical: Runway < 3 months").
 2.  **🔮 Forecast:** Uses **Holt-Winters Exponential Smoothing** to predict future cash flows with confidence intervals.
 3.  **🌍 Benchmark:** Connects to **Yahoo Finance API** to compare your KPIs against real-time S&P 500 data.
-4.  **🛡️ Verify:** Automated **CI/CD Pipelines** audit the financial math on every code push to ensure accuracy.
+4.  **🛡️ Verify:** Automated **CI/CD Pipelines** audit the financial math on every commit to ensure accuracy.
+
+## 🧠 AI Architecture
+FinMod Agent uses a **Hybrid Intelligence** approach:
+1.  **Deterministic Engine (NumPy):** Handles precise financial math (DCF, WACC).
+2.  **Generative Engine (Gemini Pro):** Analyzing the output of the math engine to generate strategic advice.
 
 ---
 

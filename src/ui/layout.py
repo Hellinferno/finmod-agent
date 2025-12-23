@@ -1,4 +1,5 @@
 from dash import dcc, html
+import urllib.parse
 import dash_bootstrap_components as dbc
 
 def create_layout():
@@ -29,6 +30,21 @@ def create_layout():
                             
                             # Input Group 2: Financials
                             html.H5("Financials", className="mt-4 mb-3"),
+                            
+                            
+                            # SAMPLE CSV BUTTON
+                            html.Div([
+                                html.Label("Data Template:", className="fw-bold small"),
+                                html.Br(),
+                                html.A(
+                                    dbc.Button("📥 Download Sample CSV", size="sm", color="light", outline=True, className="mb-3 w-100"),
+                                    id="download-link",
+                                    download="finmod_template.csv",
+                                    href="data:text/csv;charset=utf-8," + urllib.parse.quote("year,revenue,growth_rate,ebitda_margin,tax_rate,capex_ratio\n2024,1000,0.10,0.25,0.21,0.05\n2025,1100,0.10,0.25,0.21,0.05"),
+                                    target="_blank"
+                                )
+                            ], className="mb-3"),
+
                             dbc.Label("Free Cash Flows (CSV String)"),
                             dbc.Input(id='input-cashflows', value="100,120,140,160,180", type='text', className="mb-4", placeholder="e.g. 1000, 1200, 1450, 1600, 1800"),
                             
