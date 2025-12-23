@@ -1,34 +1,37 @@
 
+import google.generativeai as genai
+import os
+
+# Configure the AI
+# For production, use: os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+
 def generate_cfo_insights(metrics):
     """
-    Analyzes financial metrics and generates a 'CFO Commentary'.
-    Input: metrics (dict) -> {'runway': 5.2, 'burn': -2000, 'growth': 0.15}
+    Sends financial metrics to Gemini Pro and gets a strategic CFO analysis.
     """
-    runway = metrics.get('runway', 0)
-    burn = metrics.get('burn', 0)
-    growth = metrics.get('growth', 0)
-    
-    insights = []
-    
-    # 1. RUNWAY ANALYSIS (Survival Logic)
-    if runway < 3:
-        insights.append(f"🔴 **CRITICAL DANGER:** Cash runway is only {runway:.1f} months. You must cut costs or raise capital immediately.")
-    elif runway < 6:
-        insights.append(f"⚠️ **WARNING:** Cash runway is {runway:.1f} months. Start fundraising conversations now.")
-    else:
-        insights.append(f"✅ **HEALTHY:** Strong cash position ({runway:.1f} months). You have room to invest in growth.")
+    try:
+        # 1. Define the Persona and Data
+        prompt = f"""
+        Act as a veteran CFO for a startup. Analyze these monthly metrics:
+        - Cash Runway: {metrics.get('runway')} months
+        - Monthly Burn: ${metrics.get('burn'):,.0f}
+        - Month-over-Month Growth: {metrics.get('growth', 0)*100:.1f}%
 
-    # 2. BURN RATE ANALYSIS (Efficiency Logic)
-    if burn > 50000 and growth < 0.10:
-        insights.append(f"📉 **EFFICIENCY ALERT:** You are burning ${burn:,.0f}/mo but only growing {growth*100:.1f}%. Review marketing spend.")
-    elif growth > 0.20:
-        insights.append(f"🚀 **HIGH GROWTH:** Growing at {growth*100:.1f}% monthly. Current burn rate is justified.")
+        Task:
+        1. Give a 1-sentence assessment of financial health (Critical/Healthy/Stable).
+        2. Provide 2 specific, actionable strategic recommendations based on these numbers.
+        3. Use professional but urgent tone if runway is low.
+        4. Keep it under 100 words.
+        """
 
-    # 3. STRATEGIC ADVICE
-    if runway > 12 and growth < 0.05:
-        insights.append("💡 **CFO ADVICE:** You are too conservative. Use your cash pile to hire sales staff or acquire a competitor.")
+        # 2. Call the Model
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(prompt)
 
-    if not insights:
-        insights.append("ℹ️ **STATUS:** Financials look stable. No immediate alerts.")
+        # 3. Return the AI's words
+        return response.text
 
-    return "\n\n".join(insights)
+    except Exception as e:
+        # Fallback if internet/API fails
+        return f"⚠️ AI Analysis Unavailable: {str(e)}. (Check API Key)"
