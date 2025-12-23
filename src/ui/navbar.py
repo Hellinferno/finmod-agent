@@ -11,8 +11,9 @@ def create_navbar():
         className="mb-4",
         style={"boxShadow": "0 4px 6px -1px rgba(0,0,0,0.05)"}, # Subtle modern shadow
         children=[
-            dbc.NavItem(dbc.NavLink("Valuation", href="/valuation")),
-            dbc.NavItem(dbc.NavLink("Budgeting", href="/budget")),
-            dbc.NavItem(dbc.NavLink("Settings", href="#")), # Placeholder for future
+            dbc.NavItem(dbc.NavLink("Home", href="/", active="exact")),
+            dbc.NavItem(dbc.NavLink("Valuation", href="/valuation", active="exact")),
+            dbc.NavItem(dbc.NavLink("Budgeting", href="/budget", active="exact")),
+            dbc.NavItem(dbc.NavLink("Settings", href="#")), # Placeholder
         ]
     )
