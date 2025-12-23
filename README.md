@@ -1,39 +1,62 @@
-# Quantitative Valuation Engine & Dashboard
+# 🚀 FinMod AI: Intelligent Financial CFO Agent
+
 ![Financial Model Audit](https://github.com/Hellinferno/finmod-agent/actions/workflows/financial_audit.yml/badge.svg)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](YOUR_RENDER_URL_HERE)
 
-## Overview
-A Python-based financial modeling tool capable of performing DCF Valuation and Sensitivity Analysis with vector-based performance.
+**A Full-Stack AI Financial Platform that automates valuation, forecasting, and strategic decision-making.**
 
-## 🚀 Quick Start
-1. **Download Sample Data:** [Click here to download sample.csv](data/sample_data.csv)
-2. **Launch App:** Click the [Live Demo](YOUR_RENDER_URL)
-3. **Upload:** Go to the "Forecasting" tab and drop the CSV.
-4. **See Magic:** Watch the AI generate the fan chart instantly.
+---
 
-## Architecture
-This project follows a strict MVC (Model-View-Controller) pattern to ensure scalability and maintainability:
-- **Model (`src/models`)**: Defines data structures and strict validation rules using Pydantic.
-- **Controller/Core (`src/core`)**: Handles pure business logic and mathematical computations using Numpy for vectorization.
-- **View (`src/ui`)**: A Plotly Dash application providing an interactive "Darkly" themed interface for users.
+## 💼 What It Does
+FinMod AI replaces the Junior Analyst. Instead of static Excel sheets, it uses **Python & AI** to:
+1.  **🤖 Think:** An embedded **AI Agent** analyzes runway/burn rate and generates text-based strategic advice (e.g., "Critical: Runway < 3 months").
+2.  **🔮 Forecast:** Uses **Holt-Winters Exponential Smoothing** to predict future cash flows with confidence intervals.
+3.  **🌍 Benchmark:** Connects to **Yahoo Finance API** to compare your KPIs against real-time S&P 500 data.
+4.  **🛡️ Verify:** Automated **CI/CD Pipelines** audit the financial math on every code push to ensure accuracy.
 
-## Key Features
-- **Vectorized Numpy calculations**: Optimized math with no loops for high performance.
-- **Pydantic Data Validation**: Ensures financial integrity by strictly enforcing constraints (e.g., WACC parameters).
-- **Interactive Plotly Sensitivity Heatmaps**: Visualizes how valuation changes with key assumptions.
+---
 
-## How to Run
+## 🛠️ Tech Stack
+* **Core:** Python 3.10, Pandas, NumPy Financial.
+* **AI/ML:** Scikit-Learn (Regression), Statsmodels (Time-Series).
+* **Interface:** Plotly Dash Enterprise, Bootstrap Components.
+* **Live Data:** Yahoo Finance API (`yfinance`).
+* **DevOps:** Docker, GitHub Actions (CI/CD), Render Cloud.
 
-### Local
-```bash
-python -m src.ui.app
-```
-Then access at [http://127.0.0.1:8050](http://127.0.0.1:8050)
+---
 
-### Docker
-```bash
-docker build -t finmod-agent:v1 .
-docker run -p 8050:8050 finmod-agent:v1
-```
+## ⚡ Quick Start
+**Want to try it locally?**
 
-## Disclaimer
-For educational/portfolio purposes only.
+1.  **Clone the Repo:**
+    ```bash
+    git clone https://github.com/Hellinferno/finmod-agent.git
+    cd finmod-agent
+    ```
+
+2.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Run the App:**
+    ```bash
+    python src/ui/app.py
+    ```
+    *Open http://127.0.0.1:8050 in your browser.*
+
+---
+
+## 📸 Key Features
+| Feature | Description | Tech Used |
+| :--- | :--- | :--- |
+| **Virtual CFO** | Rule-based AI that interprets financial health in plain English. | `agent_logic.py` |
+| **Live Benchmarking** | Real-time comparison of P/E ratios vs. S&P 500. | `yfinance` API |
+| **Valuation Engine** | DCF (Discounted Cash Flow) Calculator with Sensitivity Heatmaps. | `numpy_financial` |
+| **Auto-Audit** | GitHub Action that tests math logic on every commit. | `pytest` |
+
+---
+
+## 👨‍💻 Author
+**Ravi **
+*B.Sc. AI & Data Science | CA Student*
