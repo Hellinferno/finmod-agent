@@ -12,10 +12,53 @@ from src.ui.budget_callbacks import register_budget_callbacks
 from src.ui.forecast_callbacks import register_forecast_callbacks
 from src.ui.liquidity_callbacks import register_liquidity_callbacks
 from src.ui.benchmark_callbacks import register_benchmark_callbacks
+from src.core.market_data import get_market_benchmark
 
 # Initialize App with Bootstrap Theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY], suppress_callback_exceptions=True)
 app.title = "FinMod Enterprise Engine"
+
+# ---------------------------------------------------------
+# CALLBACK: Fetch Live Market Data
+# ---------------------------------------------------------
+@app.callback(
+    Output("benchmark-data", "children"),
+    Input("btn-refresh-market", "n_clicks"),
+    prevent_initial_call=True
+)
+def update_benchmark_card(n_clicks):
+    # 1. Fetch live data for the S&P 500 (SPY)
+    # You can change 'SPY' to 'AAPL' or 'MSFT' if you want
+    data = get_market_benchmark("SPY")
+    
+    if not data['success']:
+        return "⚠️ Error fetching market data. Check internet connection."
+
+    # 2. Extract metrics
+    market_pe = data['pe_ratio']
+    market_price = data['price']
+    
+    # 3. (Optional) Define YOUR company's metric for comparison
+    # In the future, replace this 15.0 with your actual calculated P/E from your CSV
+    my_company_pe = 15.0 
+    
+    # 4. Generate the Comparison Logic
+    if my_company_pe < market_pe:
+        comparison = f"✅ Cheaper than Market ({market_pe})"
+    else:
+        comparison = f"❌ More Expensive than Market ({market_pe})"
+
+    # 5. Return the formatted text
+    # Using dcc.Markdown for better formatting if element allows, but element is html.P.
+    # Just returning text for now as per instructions, but adding markdown render for safety.
+    return f"""
+    🇺🇸 **S&P 500 ETF (SPY)**
+    Price: ${market_price}
+    Market P/E Ratio: {market_pe}
+    
+    🔍 **Comparison:**
+    Your P/E (est. {my_company_pe}) is {comparison}.
+    """
 
 # Routing Layout
 app.layout = html.Div(

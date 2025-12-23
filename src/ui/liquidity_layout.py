@@ -1,6 +1,7 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from src.core.agent_logic import generate_cfo_insights
+from src.core.market_data import get_market_benchmark
 
 def create_liquidity_layout():
     return dbc.Container(
@@ -115,6 +116,20 @@ def create_liquidity_layout():
                                 )
                             ])
                         ], className="mb-4 mt-4 shadow-lg border-info"),
+                        width=12,
+                        className="px-4"
+                    ),
+
+                    # Real-World Benchmark Card
+                    dbc.Col(
+                        dbc.Card([
+                            dbc.CardHeader("🌍 Real-World Benchmark"),
+                            dbc.CardBody([
+                                html.H5("Vs. S&P 500 (SPY)", id="benchmark-title"),
+                                html.P(id="benchmark-data", children="Loading live market data..."),
+                                dbc.Button("Refresh Market Data", id="btn-refresh-market", color="primary", size="sm")
+                            ])
+                        ], className="mb-4 shadow-sm"),
                         width=12,
                         className="px-4"
                     )
