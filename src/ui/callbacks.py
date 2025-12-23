@@ -16,8 +16,9 @@ def register_callbacks(app):
             Output('output-share-price', 'children'),
             Output('waterfall-graph', 'figure'),
             Output('sensitivity-heatmap', 'figure'),
-            Output('error-alert', 'children'),
-            Output('error-alert', 'is_open')
+            Output('error-toast', 'is_open'),
+            Output('error-toast', 'header'),
+            Output('error-toast', 'children')
         ],
         [Input('btn-calculate', 'n_clicks')],
         [
@@ -31,106 +32,124 @@ def register_callbacks(app):
         if not n_clicks:
             return no_update
 
-        # 1. Parsing and Validation
+        # Wrapper for Error Handling
         try:
-            # Parse CSV string
-            if not cashflows_str:
-                raise ValueError("Cash flows cannot be empty")
-            
+            # 1. Parsing and Validation
             try:
-                cash_flows = [float(x.strip()) for x in cashflows_str.split(',')]
+                # Handle Multiline (Year, CashFlow) OR Simple List
+                if not cashflows_str:
+                     raise ValueError("Cash flows cannot be empty")
+                     
+                if '\n' in cashflows_str or (',' in cashflows_str and cashflows_str.count(',') > len(cashflows_str.split('\n'))):
+                    # It's likely a CSV structure
+                    rows = [row.split(',') for row in cashflows_str.strip().split('\n') if row.strip()]
+                    cash_flows = [float(row[-1].strip()) for row in rows]
+                else:
+                    # Fallback
+                    cash_flows = [float(x.strip()) for x in cashflows_str.split(',')]
+                    
+                if len(cash_flows) < 2:
+                    raise ValueError("Need at least 2 years of cash flow data.")
+                    
             except ValueError:
-                raise ValueError("Cash flows must be a comma-separated list of numbers")
+                raise ValueError("Invalid format. Usage: 'Year, Value' per line (e.g. 2024, 1000) or comma-separated list.")
 
             # Instantiate Pydantic Model
-            # Note: We divide percentages by 100 if user input 10 for 10%?
-            # Layout default was 0.10. User prompt says "WACC (%) -> value=0.10".
-            # So inputs are decimals.
-            
             fin_input = FinancialInput(
                 wacc=float(wacc),
                 terminal_growth_rate=float(term_growth),
                 cash_flows=cash_flows
             )
-            
-        except (ValidationError, ValueError) as e:
-            # Format error message
-            msg = str(e)
-            if hasattr(e, 'errors'): # Pydantic
-                msg = "; ".join([err['msg'] for err in e.errors()])
-            
-            return no_update, no_update, no_update, no_update, no_update, msg, True
 
-        # 2. Calculation
-        try:
+            # 2. Calculation
             results = calculate_dcf(fin_input)
             sensitivity = run_sensitivity_analysis(fin_input)
+
+            # 3. Visualization
+            ev_fmt = f"${results['enterprise_value']:,.2f}"
+            eq_fmt = f"${results['equity_value']:,.2f}"
+            share_price_fmt = f"${results['equity_value']:,.2f} (100% Equity)" 
+
+            # Waterfall Chart
+            npv_fcf = results['npv']
+            pv_tv = results['pv_terminal_value']
+            ev = results['enterprise_value']
+            
+            fig_waterfall = go.Figure(go.Waterfall(
+                name = "DCF Valuation",
+                orientation = "v",
+                measure = ["relative", "relative", "total"],
+                x = ["PV of Free Cash Flows", "PV of Terminal Value", "Enterprise Value"],
+                textposition = "outside",
+                text = [f"{npv_fcf:.0f}", f"{pv_tv:.0f}", f"{ev:.0f}"],
+                y = [npv_fcf, pv_tv, ev],
+                connector = {"line": {"color": "rgb(63, 63, 63)"}},
+            ))
+            
+            fig_waterfall.update_layout(
+                title = dict(text="Valuation Waterfall", font=dict(size=14, color="#1e293b")),
+                template="plotly_white",
+                showlegend = False,
+                font=dict(family="Inter, sans-serif", size=12, color="#1e293b"),
+                margin=dict(l=40, r=20, t=40, b=40),
+                hovermode="x unified",
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                xaxis=dict(showgrid=False, linecolor='#e2e8f0'),
+                yaxis=dict(showgrid=True, gridcolor='#f1f5f9', zeroline=False),
+            )
+            
+            # Heatmap
+            base_wacc = fin_input.wacc
+            base_growth = fin_input.growth_rate_projection
+            
+            wacc_axis = np.linspace(base_wacc - 0.02, base_wacc + 0.02, 5)
+            growth_axis = np.linspace(base_growth - 0.01, base_growth + 0.01, 5)
+            
+            x_labels = [f"G:{g:.1%}" for g in growth_axis]
+            y_labels = [f"W:{w:.1%}" for w in wacc_axis]
+            
+            fig_heatmap = go.Figure(data=go.Heatmap(
+                z=sensitivity,
+                x=x_labels,
+                y=y_labels,
+                colorscale='Viridis',
+                hoverongaps = False,
+                texttemplate="%{z:.0f}"
+            ))
+            
+            fig_heatmap.update_layout(
+                title=dict(text="Sensitivity: WACC vs Growth", font=dict(size=14, color="#1e293b")),
+                template="plotly_white",
+                xaxis_title="Growth Scenarios",
+                yaxis_title="WACC Scenarios",
+                font=dict(family="Inter, sans-serif", size=12, color="#1e293b"),
+                margin=dict(l=40, r=20, t=40, b=40),
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                xaxis=dict(showgrid=False, linecolor='#e2e8f0'),
+                yaxis=dict(showgrid=True, gridcolor='#f1f5f9', zeroline=False),
+            )
+            
+            # SUCCESS: Charts + Close Toast
+            return ev_fmt, eq_fmt, share_price_fmt, fig_waterfall, fig_heatmap, False, "", ""
+
         except Exception as e:
-             return no_update, no_update, no_update, no_update, no_update, f"Calculation Error: {str(e)}", True
-
-        # 3. Visualization
-        
-        # Format KPIs
-        ev_fmt = f"${results['enterprise_value']:,.2f}"
-        eq_fmt = f"${results['equity_value']:,.2f}"
-        # Implied Share Price: Arbitrary share count since not in input.
-        # Let's assume 1M shares or just display "N/A" if not provided?
-        # User requested "Implied Share Price".
-        # I'll assume 1.0 (Value per share = Equity Value) or 1M shares.
-        # Or better, just display Equity Value / 1 (Per Share implies we assume 1 share 100%).
-        # I'll just equate it to Equity Value for this demo context or divide by 1.
-        share_price_fmt = f"${results['equity_value']:,.2f} (100% Equity)" 
-
-        # Waterfall Chart
-        # PV of Cash Flows vs PV of Terminal Value
-        npv_fcf = results['npv']
-        pv_tv = results['pv_terminal_value']
-        ev = results['enterprise_value']
-        
-        fig_waterfall = go.Figure(go.Waterfall(
-            name = "DCF Valuation",
-            orientation = "v",
-            measure = ["relative", "relative", "total"],
-            x = ["PV of Free Cash Flows", "PV of Terminal Value", "Enterprise Value"],
-            textposition = "outside",
-            text = [f"{npv_fcf:.0f}", f"{pv_tv:.0f}", f"{ev:.0f}"],
-            y = [npv_fcf, pv_tv, ev],
-            connector = {"line": {"color": "rgb(63, 63, 63)"}},
-        ))
-        
-        fig_waterfall.update_layout(
-            title = "Valuation Waterfall",
-            template="plotly_dark",
-            showlegend = False
-        )
-        
-        # Heatmap
-        # Sensitivity matrix is 5x5
-        # Axes
-        base_wacc = fin_input.wacc
-        base_growth = fin_input.growth_rate_projection # 0.0
-        
-        wacc_axis = np.linspace(base_wacc - 0.02, base_wacc + 0.02, 5)
-        growth_axis = np.linspace(base_growth - 0.01, base_growth + 0.01, 5)
-        
-        # Format axis labels to percentages
-        x_labels = [f"G:{g:.1%}" for g in growth_axis]
-        y_labels = [f"W:{w:.1%}" for w in wacc_axis]
-        
-        fig_heatmap = go.Figure(data=go.Heatmap(
-            z=sensitivity,
-            x=x_labels,
-            y=y_labels,
-            colorscale='Viridis',
-            hoverongaps = False,
-            texttemplate="%{z:.0f}"
-        ))
-        
-        fig_heatmap.update_layout(
-            title="Sensitivity: WACC vs Growth",
-            template="plotly_dark",
-            xaxis_title="Growth Scenarios",
-            yaxis_title="WACC Scenarios"
-        )
-        
-        return ev_fmt, eq_fmt, share_price_fmt, fig_waterfall, fig_heatmap, "", False
+            # ERROR: Show Toast
+            error_msg = str(e)
+            if hasattr(e, 'errors'): # Pydantic
+                 error_msg = "; ".join([err['msg'] for err in e.errors()])
+            
+            # Return Empty/No Update for charts, and OPEN the Toast
+            empty_fig = {
+                "layout": {
+                    "xaxis": {"visible": False},
+                    "yaxis": {"visible": False},
+                    "annotations": [{
+                        "text": "Fix errors to see chart",
+                        "xref": "paper", "yref": "paper",
+                        "showarrow": False, "font": {"size": 20}
+                    }]
+                }
+            }
+            return "---", "---", "---", empty_fig, empty_fig, True, "Calculation Error", error_msg

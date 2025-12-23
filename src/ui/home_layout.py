@@ -7,8 +7,8 @@ layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H1("FinMod AI", className="display-3 fw-bold text-primary mb-3"),
-            html.P("The Intelligent CFO Agent for Modern Finance", className="lead text-light"),
-            html.Hr(className="my-4", style={"borderColor": "rgba(255,255,255,0.2)"}),
+            html.P("The Intelligent CFO Agent for Modern Finance", className="lead text-dark"),
+            html.Hr(className="my-4", style={"borderColor": "rgba(0,0,0,0.1)"}),
             html.P("Select a module below to begin your automated financial analysis.", className="text-muted"),
         ], width=12, className="text-center py-5")
     ]),

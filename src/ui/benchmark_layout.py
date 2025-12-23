@@ -69,15 +69,7 @@ def create_benchmark_layout():
                                                 {'name': 'Debt/Equity', 'id': 'Debt to Equity', 'type': 'numeric', 'format': {'specifier': '.2f'}},
                                                 {'name': 'P/E', 'id': 'Trailing PE', 'type': 'numeric', 'format': {'specifier': '.1f'}},
                                             ],
-                                            style_header={
-                                                'backgroundColor': 'rgb(30, 30, 30)',
-                                                'color': 'white',
-                                                'fontWeight': 'bold'
-                                            },
-                                            style_data={
-                                                'backgroundColor': 'rgb(50, 50, 50)',
-                                                'color': 'white'
-                                            },
+                                            # Removed dark mode styles
                                             style_data_conditional=[
                                                 {
                                                     'if': {'filter_query': '{Ticker} = "MY COMPANY"'},

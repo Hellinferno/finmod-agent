@@ -25,8 +25,15 @@ init_db()
 from dotenv import load_dotenv
 load_dotenv()
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY], suppress_callback_exceptions=True)
-app.title = "FinMod Enterprise Engine"
+app = dash.Dash(
+    __name__, 
+    external_stylesheets=[
+        dbc.themes.LITERA,
+        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+    ],
+    suppress_callback_exceptions=True
+)
+app.title = "FinMod Agent | Professional Valuation"
 
 # ---------------------------------------------------------
 # CALLBACK: Fetch Live Market Data

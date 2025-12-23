@@ -110,30 +110,21 @@ def create_budget_layout():
                                                         {"name": "Variance %", "id": "variance_pct", "type": "numeric", "format": {"specifier": ".1%"}},
                                                         {"name": "Status", "id": "status"}, 
                                                     ],
-                                                    style_header={
-                                                        'backgroundColor': '#303030',
-                                                        'color': 'white',
-                                                        'fontWeight': 'bold'
-                                                    },
-                                                    style_cell={
-                                                        'backgroundColor': '#222',
-                                                        'color': 'white',
-                                                        'border': '1px solid #444'
-                                                    },
+                                                    # Removed dark mode styles
                                                     style_data_conditional=[
                                                         {
                                                             'if': {
                                                                 'filter_query': '{status} = "Unfavorable"',
                                                             },
-                                                            'backgroundColor': '#660000',
-                                                            'color': 'white'
+                                                            'backgroundColor': '#ffcccc',
+                                                            'color': 'black'
                                                         },
                                                         {
                                                             'if': {
                                                                 'filter_query': '{status} = "Favorable"',
                                                             },
-                                                            'backgroundColor': '#004400',
-                                                            'color': 'white'
+                                                            'backgroundColor': '#ccffcc',
+                                                            'color': 'black'
                                                         }
                                                     ],
                                                     filter_action="native",
