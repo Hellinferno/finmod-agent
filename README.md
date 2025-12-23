@@ -1,4 +1,5 @@
 # Quantitative Valuation Engine & Dashboard
+![Financial Model Audit](https://github.com/Hellinferno/finmod-agent/actions/workflows/financial_audit.yml/badge.svg)
 
 ## Overview
 A Python-based financial modeling tool capable of performing DCF Valuation and Sensitivity Analysis with vector-based performance.
