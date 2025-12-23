@@ -1,0 +1,15 @@
+dash
+dash-bootstrap-components
+pandas
+numpy
+plotly
+statsmodels
+fpdf
+kaleido
+yfinance
+thefuzz
+python-Levenshtein
+pydantic
+scipy
+openpyxl
+requests
