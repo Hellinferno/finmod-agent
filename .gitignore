@@ -47,6 +47,9 @@ logs/
 *.swp
 *.swo
 
+# Pre-existing Unsloth reference repo (not FMVA code)
+notebooks/
+
 # OS
 .DS_Store
 Thumbs.db
