@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+secrets.json
+*_secrets.json
+
+# Notebooks
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Data (never commit financial data)
+data/raw/
+data/normalized/
+*.pkl
+
+# Models (too large for Git)
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# Outputs
+outputs/
+*.xlsx
+*.pdf
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

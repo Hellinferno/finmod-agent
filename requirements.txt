@@ -1,0 +1,48 @@
+# ============================================================
+# Financial Modeling & Valuation Agent — requirements.txt
+# Python 3.10+ | Google Colab Pro+
+# Last Updated: 2026-02-23
+# ============================================================
+
+# --- Core Data & Computation ---
+numpy==1.26.3
+pandas==2.1.4
+scipy==1.12.0
+pydantic==2.5.3
+
+# --- Financial Data ---
+yfinance==0.2.36
+
+# --- Excel I/O ---
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+
+# --- Visualization ---
+matplotlib==3.8.2
+seaborn==0.13.2
+plotly==5.18.0
+
+# --- Notebook UI ---
+ipywidgets==8.1.2
+
+# --- Templating ---
+jinja2==3.1.3
+
+# --- Export ---
+reportlab==4.1.0
+
+# --- Utilities ---
+loguru==0.7.2
+tqdm==4.66.1
+python-dateutil>=2.8.0
+colorama>=0.4.6
+tenacity==8.2.3
+httpx==0.26.0
+
+# --- Testing (dev only) ---
+pytest==7.4.4
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# --- Type Checking (dev only) ---
+mypy==1.8.0

@@ -1,0 +1,61 @@
+{
+    "company_name": "ImbalancedCo Inc.",
+    "ticker": "IMBL",
+    "currency": "USD",
+    "units": "millions",
+    "accounting_standard": "GAAP",
+    "diluted_shares_outstanding": 50.0,
+    "fiscal_year_end": "December",
+    "income_statement": {
+        "2023": {
+            "total_revenue": 300.0,
+            "cost_of_goods_sold": 180.0,
+            "gross_profit": 120.0,
+            "selling_general_admin": 50.0,
+            "depreciation_and_amortization": 15.0,
+            "ebitda": 85.0,
+            "ebit": 70.0,
+            "interest_expense": 8.0,
+            "other_income": 1.0,
+            "earnings_before_tax": 63.0,
+            "income_tax_expense": 13.2,
+            "net_income": 49.8
+        }
+    },
+    "balance_sheet": {
+        "2023": {
+            "cash_and_equivalents": 50.0,
+            "accounts_receivable": 40.0,
+            "inventory": 30.0,
+            "total_current_assets": 120.0,
+            "property_plant_equipment": 200.0,
+            "goodwill": 80.0,
+            "total_assets": 450.0,
+            "accounts_payable": 30.0,
+            "short_term_debt": 10.0,
+            "total_current_liabilities": 40.0,
+            "long_term_debt": 100.0,
+            "total_liabilities": 140.0,
+            "common_stock": 50.0,
+            "retained_earnings": 160.0,
+            "total_shareholders_equity": 210.0
+        }
+    },
+    "cash_flow_statement": {
+        "2023": {
+            "net_income": 49.8,
+            "depreciation_and_amortization": 15.0,
+            "change_in_working_capital": -5.0,
+            "cash_from_operations": 59.8,
+            "capital_expenditures": -20.0,
+            "cash_from_investing": -20.0,
+            "debt_repayment": -10.0,
+            "dividends_paid": -8.0,
+            "cash_from_financing": -18.0,
+            "net_change_in_cash": 21.8,
+            "beginning_cash": 28.2,
+            "ending_cash": 50.0
+        }
+    },
+    "_test_note": "DELIBERATELY IMBALANCED: Total Assets = $450M but Total Liabilities + Equity = $140M + $210M = $350M. Delta = $100M."
+}
