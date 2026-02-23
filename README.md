@@ -113,6 +113,30 @@ fmva/
 
 ---
 
+## 🎨 UI Prototype
+
+The `UI/` folder contains a **9-page static HTML prototype** — a fully navigable, industry-grade financial modeling interface built with Tailwind CSS.
+
+**Brand Identity:** White + Black + Light Blue — clean, minimalist, high-contrast.
+
+| Page | File | Status |
+|------|------|--------|
+| **Dashboard** | `fmva-dashboard.html` | ✅ Live |
+| **Data Ingestion** | `fmva-ingestion-screen.html` | ✅ Live |
+| **Assumptions Engine** | `fmva-assumptions-components.html` | ✅ Live |
+| **DCF Valuation** | `fmva-dcf-screen.html` | ✅ Live |
+| **3-Statement Model** | `fmva-model.html` | 🔵 Coming Soon |
+| **Trading Comps** | `fmva-comps.html` | 🔵 Coming Soon |
+| **Sensitivity Analysis** | `fmva-sensitivity.html` | 🔵 Coming Soon |
+| **Audit Trail** | `fmva-audit.html` | 🔵 Coming Soon |
+| **Export Center** | `fmva-export.html` | 🔵 Coming Soon |
+
+> Open `UI/fmva-dashboard.html` in any browser to explore. All pages are cross-linked via sidebar navigation.
+
+See [`UI/fmva-design-spec.md`](UI/fmva-design-spec.md) for full design token tables, typography scale, and component specifications.
+
+---
+
 ## 📊 Sample Data
 
 Three fully modeled fixture companies are included:
