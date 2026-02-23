@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FMVA — Financial Modeling & Valuation Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['IBM Plex Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            base: '#FFFFFF',
+            panel: '#F8FAFC',
+            surface: '#F1F5F9',
+            elevated: '#FFFFFF',
+            border: {
+              subtle: '#E2E8F0',
+              default: '#CBD5E1',
+              focus: '#3B82F6',
+            },
+            txt: {
+              primary: '#0F172A',
+              secondary: '#475569',
+              muted: '#94A3B8',
+            },
+            accent: {
+              DEFAULT: '#3B82F6',
+              hover: '#2563EB',
+              subtle: '#EFF6FF',
+            },
+            pos: {
+              DEFAULT: '#22C55E',
+              bg: '#F0FDF4',
+              text: '#15803D',
+            },
+            neg: {
+              DEFAULT: '#EF4444',
+              bg: '#FEF2F2',
+              text: '#B91C1C',
+            },
+            warn: {
+              DEFAULT: '#F59E0B',
+              bg: '#FFFBEB',
+            },
+            cell: {
+              input: '#2563EB',
+              formula: '#0F172A',
+              output: '#16A34A',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #FFFFFF;
+      font-family: 'IBM Plex Sans', sans-serif;
+      margin: 0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .number-cell {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .gradient-row:nth-child(even) {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .heat-high {
+      background: #F0FDF4;
+      color: #15803D;
+    }
+
+    .heat-mid {
+      background: #F0FDF9;
+      color: #16A34A;
+    }
+
+    .heat-base {
+      background: #EFF6FF;
+      color: #2563EB;
+      border: 1px solid #3B82F6;
+    }
+
+    .heat-low {
+      background: #FFF7ED;
+      color: #C2410C;
+    }
+
+    .heat-vlow {
+      background: #FEF2F2;
+      color: #DC2626;
+    }
+  </style>
+</head>
+
+<body class="bg-base text-txt-primary min-h-screen">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- TOPBAR                                                      -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <header
+    class="fixed top-0 left-0 right-0 z-50 h-14 bg-panel border-b border-border-subtle flex items-center px-4 gap-4">
+    <!-- Logo -->
+    <div class="flex items-center gap-2 shrink-0 w-[220px]">
+      <div class="w-7 h-7 rounded bg-accent flex items-center justify-center">
+        <span class="mono text-base font-bold text-[11px] leading-none">FV</span>
+      </div>
+      <span class="font-semibold text-[13px] tracking-tight text-txt-primary">FMVA</span>
+      <span class="text-border-default text-[10px] mono ml-1">v1.0</span>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-1.5 text-[12px] text-txt-muted">
+      <span>TechCorp Inc.</span>
+      <span class="text-border-default">/</span>
+      <span class="text-txt-secondary">DCF Valuation</span>
+      <span class="text-border-default">/</span>
+      <span class="text-txt-primary">Base Case</span>
+    </div>
+
+    <!-- Pipeline Steps -->
+    <div class="flex items-center gap-0 ml-6 flex-1">
+      <div class="flex items-center gap-0 text-[11px]">
+        <!-- Step 1 -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-pos-bg border border-pos-DEFAULT">
+          <span class="w-1.5 h-1.5 rounded-full bg-pos-DEFAULT"></span>
+          <span class="text-pos-text font-medium">Ingest</span>
+        </div>
+        <div class="w-6 h-px bg-border-default"></div>
+        <!-- Step 2 -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-pos-bg border border-pos-DEFAULT">
+          <span class="w-1.5 h-1.5 rounded-full bg-pos-DEFAULT"></span>
+          <span class="text-pos-text font-medium">Normalize</span>
+        </div>
+        <div class="w-6 h-px bg-border-default"></div>
+        <!-- Step 3 -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-pos-bg border border-pos-DEFAULT">
+          <span class="w-1.5 h-1.5 rounded-full bg-pos-DEFAULT"></span>
+          <span class="text-pos-text font-medium">Configure</span>
+        </div>
+        <div class="w-6 h-px bg-border-default"></div>
+        <!-- Step 4 ACTIVE -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-accent-subtle border border-accent">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+          <span class="text-accent font-semibold">DCF</span>
+        </div>
+        <div class="w-6 h-px bg-border-subtle"></div>
+        <!-- Step 5 -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle">
+          <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+          <span class="text-txt-muted">Sensitivity</span>
+        </div>
+        <div class="w-6 h-px bg-border-subtle"></div>
+        <!-- Step 6 -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle">
+          <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+          <span class="text-txt-muted">Export</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-pos-bg border border-pos-DEFAULT">
+        <span class="w-1.5 h-1.5 rounded-full bg-pos-DEFAULT"></span>
+        <span class="text-pos-text text-[11px] font-medium">BS CHECK PASS</span>
+      </div>
+      <button
+        class="px-3 py-1.5 rounded bg-surface border border-border-default text-txt-secondary text-[12px] hover:bg-elevated hover:text-txt-primary transition-colors">
+        Audit Trail
+      </button>
+      <button
+        class="px-3 py-1.5 rounded bg-accent text-base text-[12px] font-semibold hover:bg-accent-hover transition-colors">
+        Export ↓
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- MAIN LAYOUT: SIDEBAR + CONTENT                             -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="flex pt-14 h-screen">
+
+    <!-- SIDEBAR (240px) -->
+    <aside class="w-[240px] shrink-0 bg-panel border-r border-border-subtle flex flex-col overflow-y-auto">
+
+      <!-- Company Info -->
+      <div class="px-4 py-4 border-b border-border-subtle">
+        <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium mb-1">Subject Company</div>
+        <div class="text-[14px] font-semibold text-txt-primary">TechCorp Inc.</div>
+        <div class="flex items-center gap-2 mt-1">
+          <span class="text-[11px] mono text-txt-secondary">TECH</span>
+          <span class="text-border-default">·</span>
+          <span class="text-[11px] text-txt-muted">SaaS / Technology</span>
+        </div>
+        <div class="text-[10px] mono text-txt-muted mt-0.5">FY2023 · USD $M</div>
+      </div>
+
+      <!-- Scenario Selector -->
+      <div class="px-4 py-3 border-b border-border-subtle">
+        <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium mb-2">Active Scenario</div>
+        <div class="flex gap-1">
+          <button
+            class="flex-1 px-2 py-1 rounded bg-surface text-[11px] text-txt-secondary hover:bg-elevated transition-colors">Bear</button>
+          <button class="flex-1 px-2 py-1 rounded bg-accent text-[11px] font-semibold text-base">Base</button>
+          <button
+            class="flex-1 px-2 py-1 rounded bg-surface text-[11px] text-txt-secondary hover:bg-elevated transition-colors">Bull</button>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="px-2 py-3 flex-1">
+        <!-- Section: Analysis -->
+        <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium px-2 mb-1">Analysis</div>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors group">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <span>Data Ingestion</span>
+          <span class="ml-auto px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px] mono">✓</span>
+        </a>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+          </svg>
+          <span>3-Statement Model</span>
+          <span class="ml-auto px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px] mono">✓</span>
+        </a>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          <span>Assumptions</span>
+          <span class="ml-auto px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px] mono">✓</span>
+        </a>
+
+        <!-- Active item -->
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium bg-accent-subtle border-l-2 border-accent text-accent">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>DCF Valuation</span>
+          <span class="ml-auto w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+        </a>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-muted hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Trading Comps</span>
+          <span class="ml-auto px-1.5 py-0.5 rounded-full bg-surface text-txt-muted text-[9px] mono">P1</span>
+        </a>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-muted hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+          <span>Sensitivity</span>
+          <span class="ml-auto px-1.5 py-0.5 rounded-full bg-surface text-txt-muted text-[9px] mono">—</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="border-t border-border-subtle my-2 mx-2"></div>
+        <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium px-2 mb-1 mt-2">Quality</div>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Audit Trail</span>
+        </a>
+
+        <a href="#"
+          class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>Export</span>
+        </a>
+      </nav>
+
+      <!-- Session Stats Footer -->
+      <div class="px-4 py-3 border-t border-border-subtle bg-base">
+        <div class="text-[10px] text-txt-muted mb-1.5">Session · <span class="mono">2026-02-23 14:30</span></div>
+        <div class="flex items-center justify-between">
+          <div class="text-[11px] text-txt-secondary">All checks <span class="text-pos-DEFAULT">passed</span></div>
+          <div class="text-[10px] mono text-txt-muted">0 errors</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT AREA                                     -->
+    <!-- ═════════════════════════════════════════════════════ -->
+    <main class="flex-1 overflow-y-auto bg-base">
+
+      <!-- PAGE HEADER -->
+      <div class="sticky top-0 z-10 bg-base/95 backdrop-blur-sm border-b border-border-subtle px-6 py-4">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-0.5">
+              <h1 class="text-[18px] font-semibold text-txt-primary">DCF Valuation</h1>
+              <span
+                class="px-2 py-0.5 rounded-full bg-surface border border-border-default text-[11px] text-txt-secondary mono">Base
+                Case</span>
+            </div>
+            <p class="text-[12px] text-txt-muted">2-Stage DCF · 5-Year Projection · Gordon Growth + Exit Multiple</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select
+              class="bg-surface border border-border-default rounded px-3 py-1.5 text-[12px] text-txt-primary mono focus:outline-none focus:border-accent">
+              <option>5-Year Model</option>
+              <option>10-Year Model</option>
+            </select>
+            <button
+              class="px-4 py-1.5 rounded bg-surface border border-border-default text-[12px] text-txt-secondary hover:bg-elevated hover:text-txt-primary transition-colors">
+              ↺ Recalculate
+            </button>
+            <button
+              class="px-4 py-1.5 rounded bg-accent text-base text-[12px] font-semibold hover:bg-accent-hover transition-colors">
+              ▶ Run DCF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-5 space-y-5">
+
+        <!-- ─────────────────────────────────────── -->
+        <!-- METRIC SUMMARY BAR                      -->
+        <!-- ─────────────────────────────────────── -->
+        <div class="grid grid-cols-6 gap-3">
+          <!-- EV -->
+          <div class="col-span-1 bg-panel rounded-lg border border-border-subtle p-4">
+            <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Enterprise Value</div>
+            <div class="mono text-[22px] font-bold text-cell-output">$1,102M</div>
+            <div class="text-[10px] text-txt-muted mt-1">GG Method</div>
+          </div>
+          <!-- Equity Value -->
+          <div class="col-span-1 bg-panel rounded-lg border border-border-subtle p-4">
+            <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Equity Value</div>
+            <div class="mono text-[22px] font-bold text-cell-output">$952M</div>
+            <div class="text-[10px] text-txt-muted mt-1">EV − Net Debt</div>
+          </div>
+          <!-- Implied Price -->
+          <div class="col-span-1 bg-panel rounded-lg border border-accent-subtle border-2 p-4">
+            <div class="text-[10px] text-accent uppercase tracking-widest mb-1">Implied Share Price</div>
+            <div class="mono text-[22px] font-bold text-accent">$9.52</div>
+            <div class="flex items-center gap-1 mt-1">
+              <span class="text-[10px] text-pos-DEFAULT">↑ +12.0%</span>
+              <span class="text-[10px] text-txt-muted">vs. current</span>
+            </div>
+          </div>
+          <!-- TV % -->
+          <div class="col-span-1 bg-panel rounded-lg border border-border-subtle p-4">
+            <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">TV % of EV</div>
+            <div class="mono text-[22px] font-bold text-warn-DEFAULT">71.4%</div>
+            <div class="text-[10px] text-warn-DEFAULT mt-1">Below 80% threshold</div>
+          </div>
+          <!-- WACC -->
+          <div class="col-span-1 bg-panel rounded-lg border border-border-subtle p-4">
+            <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">WACC</div>
+            <div class="mono text-[22px] font-bold text-cell-input">10.0%</div>
+            <div class="text-[10px] text-txt-muted mt-1 mono">User Input</div>
+          </div>
+          <!-- TGR -->
+          <div class="col-span-1 bg-panel rounded-lg border border-border-subtle p-4">
+            <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Terminal GR</div>
+            <div class="mono text-[22px] font-bold text-cell-input">2.5%</div>
+            <div class="text-[10px] text-txt-muted mt-1 mono">User Input</div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────── -->
+        <!-- TWO-COLUMN LAYOUT: UFCF TABLE + TV      -->
+        <!-- ─────────────────────────────────────── -->
+        <div class="grid grid-cols-12 gap-4">
+
+          <!-- UFCF PROJECTION TABLE (8 cols) -->
+          <div class="col-span-8 bg-panel rounded-lg border border-border-subtle overflow-hidden">
+            <div class="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
+              <div>
+                <div class="text-[13px] font-semibold text-txt-primary">UFCF Projections</div>
+                <div class="text-[11px] text-txt-muted mt-0.5">Unlevered Free Cash Flow · <span class="mono">NOPAT + D&A
+                    − CapEx − ΔNWC</span></div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[10px]">
+                <span class="px-1.5 py-0.5 rounded bg-info/10 border border-cell-input/30 text-cell-input">Input</span>
+                <span
+                  class="px-1.5 py-0.5 rounded bg-surface border border-cell-formula/30 text-cell-formula">Formula</span>
+                <span
+                  class="px-1.5 py-0.5 rounded bg-pos-bg border border-cell-output/30 text-cell-output">Output</span>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[11px]">
+                <thead>
+                  <tr class="bg-surface border-b border-border-subtle">
+                    <th class="text-left px-3 py-2 text-txt-muted font-medium w-40">Driver</th>
+                    <th class="text-right px-3 py-2 text-txt-muted font-medium">FY2023A</th>
+                    <th class="text-right px-3 py-2 text-txt-muted font-medium bg-elevated/30">Year 1</th>
+                    <th class="text-right px-3 py-2 text-txt-muted font-medium bg-elevated/30">Year 2</th>
+                    <th class="text-right px-3 py-2 text-txt-muted font-medium bg-elevated/30">Year 3</th>
+                    <th class="text-right px-3 py-2 text-txt-muted font-medium bg-elevated/30">Year 4</th>
+                    <th class="text-right px-3 py-2 text-txt-muted font-medium bg-elevated/30">Year 5</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Revenue Growth Row -->
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">Revenue Growth</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">10.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">10.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">9.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">9.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">8.0%</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">Revenue ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-secondary">500.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">550.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">605.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">659.5</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">719.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">776.1</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">EBITDA Margin</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">25.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">25.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">25.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">25.0%</td>
+                    <td class="px-3 py-2 number-cell text-cell-input">25.0%</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">EBITDA ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-secondary">125.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">137.5</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">151.3</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">164.9</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">179.8</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">194.0</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">D&A ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-secondary">25.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">27.5</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">30.3</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">33.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">36.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">38.8</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">EBIT ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-secondary">100.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">110.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">121.0</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">131.9</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">143.8</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">155.2</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">NOPAT ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">86.9</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">95.6</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">104.2</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">113.6</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">122.6</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">CapEx ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-secondary">(30.0)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(33.0)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(36.3)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(39.6)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(43.1)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(46.6)</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">ΔNWC ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(4.0)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(4.4)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(4.4)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(4.8)</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">(4.6)</td>
+                  </tr>
+                  <!-- UFCF highlighted row -->
+                  <tr class="bg-accent-subtle/50 border-b border-accent/30">
+                    <td class="px-3 py-2.5 text-txt-primary font-semibold">UFCF ($M)</td>
+                    <td class="px-3 py-2.5 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2.5 number-cell text-cell-output font-semibold">77.4</td>
+                    <td class="px-3 py-2.5 number-cell text-cell-output font-semibold">85.2</td>
+                    <td class="px-3 py-2.5 number-cell text-cell-output font-semibold">94.2</td>
+                    <td class="px-3 py-2.5 number-cell text-cell-output font-semibold">102.0</td>
+                    <td class="px-3 py-2.5 number-cell text-cell-output font-semibold">110.2</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle/50 bg-surface/20">
+                    <td class="px-3 py-2 text-txt-muted">Discount Factor</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">0.9091</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">0.8264</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">0.7513</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">0.6830</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">0.6209</td>
+                  </tr>
+                  <tr class="border-b-2 border-accent/30 bg-surface/20">
+                    <td class="px-3 py-2 text-txt-secondary font-medium">PV(UFCF) ($M)</td>
+                    <td class="px-3 py-2 number-cell text-txt-muted">—</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">70.4</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">70.4</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">70.8</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">69.7</td>
+                    <td class="px-3 py-2 number-cell text-cell-formula">68.4</td>
+                  </tr>
+                  <!-- Sum row -->
+                  <tr class="bg-panel">
+                    <td class="px-3 py-2.5 text-txt-primary font-semibold">Σ PV(UFCFs)</td>
+                    <td colspan="5" class="px-3 py-2.5 text-txt-muted text-[11px]"></td>
+                    <td class="px-3 py-2.5 number-cell text-cell-output font-bold text-[13px]">316.2</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TERMINAL VALUE + EV BRIDGE (4 cols) -->
+          <div class="col-span-4 space-y-4">
+
+            <!-- Terminal Value Card -->
+            <div class="bg-panel rounded-lg border border-border-subtle overflow-hidden">
+              <div class="px-4 py-3 border-b border-border-subtle">
+                <div class="text-[13px] font-semibold text-txt-primary">Terminal Value</div>
+                <div class="text-[11px] text-txt-muted mt-0.5">Year 5 · Both methods</div>
+              </div>
+              <div class="p-4 space-y-3">
+                <!-- Gordon Growth -->
+                <div class="p-3 rounded bg-surface border border-border-subtle">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-[11px] text-txt-secondary font-medium">Gordon Growth Model</span>
+                    <span
+                      class="px-1.5 py-0.5 rounded bg-pos-bg text-pos-text text-[9px] mono font-medium">ACTIVE</span>
+                  </div>
+                  <div class="mono text-[11px] text-txt-muted mb-2">TV = UFCF × (1+g) / (WACC−g)</div>
+                  <div class="grid grid-cols-3 gap-2 mb-2">
+                    <div class="text-center">
+                      <div class="text-[9px] text-txt-muted">UFCF_T</div>
+                      <div class="mono text-[11px] text-cell-input">$110.2M</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-[9px] text-txt-muted">WACC</div>
+                      <div class="mono text-[11px] text-cell-input">10.0%</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-[9px] text-txt-muted">TGR</div>
+                      <div class="mono text-[11px] text-cell-input">2.5%</div>
+                    </div>
+                  </div>
+                  <div class="border-t border-border-subtle pt-2 flex justify-between items-center">
+                    <span class="text-[11px] text-txt-muted">TV (undiscounted)</span>
+                    <span class="mono text-[14px] font-bold text-cell-output">$1,505.5M</span>
+                  </div>
+                  <div class="flex justify-between items-center mt-1">
+                    <span class="text-[11px] text-txt-muted">PV(TV)</span>
+                    <span class="mono text-[14px] font-bold text-cell-output">$785.8M</span>
+                  </div>
+                </div>
+                <!-- Exit Multiple -->
+                <div class="p-3 rounded bg-surface border border-border-subtle">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-[11px] text-txt-secondary font-medium">Exit Multiple Method</span>
+                    <span
+                      class="px-1.5 py-0.5 rounded bg-surface border border-border-default text-txt-muted text-[9px] mono">REFERENCE</span>
+                  </div>
+                  <div class="mono text-[11px] text-txt-muted mb-2">TV = EBITDA_T × Exit Multiple</div>
+                  <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div class="text-center">
+                      <div class="text-[9px] text-txt-muted">EBITDA_T</div>
+                      <div class="mono text-[11px] text-cell-input">$194.0M</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-[9px] text-txt-muted">Multiple</div>
+                      <div class="mono text-[11px] text-cell-input">12.0×</div>
+                    </div>
+                  </div>
+                  <div class="border-t border-border-subtle pt-2 flex justify-between items-center">
+                    <span class="text-[11px] text-txt-muted">TV (undiscounted)</span>
+                    <span class="mono text-[14px] font-bold text-txt-secondary">$2,328.0M</span>
+                  </div>
+                  <div class="flex justify-between items-center mt-1">
+                    <span class="text-[11px] text-txt-muted">PV(TV)</span>
+                    <span class="mono text-[14px] font-bold text-txt-secondary">$1,215.1M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EV Bridge Card -->
+            <div class="bg-panel rounded-lg border border-border-subtle overflow-hidden">
+              <div class="px-4 py-3 border-b border-border-subtle">
+                <div class="text-[13px] font-semibold text-txt-primary">EV → Equity Bridge</div>
+              </div>
+              <div class="p-4 space-y-1.5">
+                <div class="flex justify-between items-center py-1">
+                  <span class="text-[12px] text-txt-secondary">Σ PV(UFCFs)</span>
+                  <span class="mono text-[12px] text-cell-formula">+ $316.2M</span>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span class="text-[12px] text-txt-secondary">PV(Terminal Value)</span>
+                  <span class="mono text-[12px] text-cell-formula">+ $785.8M</span>
+                </div>
+                <div class="border-t border-border-default my-1 pt-1">
+                  <div class="flex justify-between items-center py-1">
+                    <span class="text-[12px] font-semibold text-txt-primary">Enterprise Value</span>
+                    <span class="mono text-[13px] font-bold text-cell-output">$1,102.0M</span>
+                  </div>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span class="text-[12px] text-txt-secondary">Less: Net Debt</span>
+                  <span class="mono text-[12px] text-neg-DEFAULT">− $150.0M</span>
+                </div>
+                <div class="border-t border-border-default my-1 pt-1">
+                  <div class="flex justify-between items-center py-1">
+                    <span class="text-[12px] font-semibold text-txt-primary">Equity Value</span>
+                    <span class="mono text-[13px] font-bold text-cell-output">$952.0M</span>
+                  </div>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span class="text-[12px] text-txt-secondary">Diluted Shares</span>
+                  <span class="mono text-[12px] text-txt-secondary">100.0M</span>
+                </div>
+                <div class="bg-accent-subtle rounded-lg border border-accent/30 p-3 mt-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-[12px] font-semibold text-accent">Implied Share Price</span>
+                    <span class="mono text-[20px] font-bold text-accent">$9.52</span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[10px] text-pos-DEFAULT">▲ 12.0% upside</span>
+                    <span class="text-[10px] text-txt-muted">vs. $8.50 current</span>
+                  </div>
+                </div>
+                <!-- TV Warning -->
+                <div class="flex items-start gap-2 p-2 rounded bg-warn-bg border border-warn-DEFAULT/30 mt-2">
+                  <span class="text-warn-DEFAULT text-[12px] shrink-0 mt-0.5">⚠</span>
+                  <div>
+                    <div class="text-[10px] font-semibold text-warn-DEFAULT mono">TV_HIGH: 71.4%</div>
+                    <div class="text-[10px] text-txt-muted mt-0.5">TV represents 71% of EV. Sensitivity analysis
+                      recommended.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────── -->
+        <!-- SENSITIVITY MATRIX (WACC vs TGR)        -->
+        <!-- ─────────────────────────────────────── -->
+        <div class="bg-panel rounded-lg border border-border-subtle overflow-hidden">
+          <div class="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
+            <div>
+              <div class="text-[13px] font-semibold text-txt-primary">Sensitivity Analysis — WACC × Terminal Growth Rate
+              </div>
+              <div class="text-[11px] text-txt-muted mt-0.5">Implied Share Price ($) · Green = Above Base · Red = Below
+                Base</div>
+            </div>
+            <button
+              class="px-3 py-1.5 rounded bg-surface border border-border-default text-[11px] text-txt-secondary hover:bg-elevated transition-colors">
+              View Full Matrix →
+            </button>
+          </div>
+          <div class="p-4 overflow-x-auto">
+            <table class="mono text-[11px] w-full">
+              <thead>
+                <tr>
+                  <th class="text-left pb-3 pr-4 text-txt-muted font-medium">WACC \ TGR</th>
+                  <th class="text-center pb-3 px-3 text-txt-muted font-medium">1.5%</th>
+                  <th class="text-center pb-3 px-3 text-txt-muted font-medium">2.0%</th>
+                  <th class="text-center pb-3 px-3 text-txt-muted font-medium border-l border-accent/50">2.5%</th>
+                  <th class="text-center pb-3 px-3 text-txt-muted font-medium">3.0%</th>
+                  <th class="text-center pb-3 px-3 text-txt-muted font-medium">3.5%</th>
+                </tr>
+              </thead>
+              <tbody class="space-y-1">
+                <tr>
+                  <td class="pr-4 py-1.5 text-txt-secondary">8.0%</td>
+                  <td class="px-3 py-1.5 text-center rounded">
+                    <div class="heat-high rounded px-2 py-1">$14.20</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-high rounded px-2 py-1">$15.80</div>
+                  </td>
+                  <td class="px-1 py-1.5 text-center border-l border-accent/30">
+                    <div class="heat-high rounded px-2 py-1 mx-2">$17.90</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-high rounded px-2 py-1">$21.10</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-high rounded px-2 py-1">$26.40</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="pr-4 py-1.5 text-txt-secondary">9.0%</td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$11.30</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$12.40</div>
+                  </td>
+                  <td class="px-1 py-1.5 text-center border-l border-accent/30">
+                    <div class="heat-mid rounded px-2 py-1 mx-2">$13.70</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$15.30</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$17.60</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="pr-4 py-1.5 text-txt-secondary font-semibold">10.0% ←</td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-low rounded px-2 py-1">$8.10</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-low rounded px-2 py-1">$8.80</div>
+                  </td>
+                  <td class="px-1 py-1.5 text-center border-l border-accent/30">
+                    <div class="heat-base rounded px-2 py-1.5 mx-2 font-bold">$9.52</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$10.40</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$11.60</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="pr-4 py-1.5 text-txt-secondary">11.0%</td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-vlow rounded px-2 py-1">$6.20</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-low rounded px-2 py-1">$6.70</div>
+                  </td>
+                  <td class="px-1 py-1.5 text-center border-l border-accent/30">
+                    <div class="heat-low rounded px-2 py-1 mx-2">$7.30</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-low rounded px-2 py-1">$8.10</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-mid rounded px-2 py-1">$9.10</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="pr-4 py-1.5 text-txt-secondary">12.0%</td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-vlow rounded px-2 py-1">$4.90</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-vlow rounded px-2 py-1">$5.30</div>
+                  </td>
+                  <td class="px-1 py-1.5 text-center border-l border-accent/30">
+                    <div class="heat-vlow rounded px-2 py-1 mx-2">$5.80</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-low rounded px-2 py-1">$6.40</div>
+                  </td>
+                  <td class="px-3 py-1.5 text-center">
+                    <div class="heat-low rounded px-2 py-1">$7.20</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="flex items-center gap-4 mt-4 pt-3 border-t border-border-subtle">
+              <span class="text-[10px] text-txt-muted">Legend:</span>
+              <span class="flex items-center gap-1"><span
+                  class="inline-block w-8 h-3 rounded heat-high opacity-80"></span><span
+                  class="text-[10px] text-txt-muted">&gt;30% above base</span></span>
+              <span class="flex items-center gap-1"><span
+                  class="inline-block w-8 h-3 rounded heat-mid opacity-80"></span><span
+                  class="text-[10px] text-txt-muted">0–30% above</span></span>
+              <span class="flex items-center gap-1"><span
+                  class="inline-block w-8 h-3 rounded heat-base opacity-80"></span><span
+                  class="text-[10px] text-txt-muted">Base case</span></span>
+              <span class="flex items-center gap-1"><span
+                  class="inline-block w-8 h-3 rounded heat-low opacity-80"></span><span
+                  class="text-[10px] text-txt-muted">0–30% below</span></span>
+              <span class="flex items-center gap-1"><span
+                  class="inline-block w-8 h-3 rounded heat-vlow opacity-80"></span><span
+                  class="text-[10px] text-txt-muted">&gt;30% below base</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────── -->
+        <!-- FOOTBALL FIELD CHART                    -->
+        <!-- ─────────────────────────────────────── -->
+        <div class="bg-panel rounded-lg border border-border-subtle overflow-hidden">
+          <div class="px-4 py-3 border-b border-border-subtle">
+            <div class="text-[13px] font-semibold text-txt-primary">Football Field — Valuation Range Summary</div>
+            <div class="text-[11px] text-txt-muted mt-0.5">Implied Share Price ($) · All methodologies · Current price:
+              $8.50</div>
+          </div>
+          <div class="p-5 space-y-3">
+            <!-- Current price marker line header -->
+            <div class="relative pl-48">
+              <div class="flex text-[9px] text-txt-muted mono justify-between" style="padding-left:0%">
+                <span>$0</span>
+                <span>$5</span>
+                <span>$10</span>
+                <span>$15</span>
+                <span>$20</span>
+                <span>$25</span>
+              </div>
+            </div>
+
+            <!-- DCF Gordon Growth -->
+            <div class="flex items-center gap-3">
+              <div class="w-44 shrink-0 text-right">
+                <div class="text-[11px] text-txt-secondary">DCF (Gordon Growth)</div>
+                <div class="text-[10px] text-txt-muted mono">$7.30 – $14.20</div>
+              </div>
+              <div class="flex-1 h-7 bg-surface rounded relative">
+                <div class="absolute h-full rounded bg-gradient-to-r from-info/60 to-info/80"
+                  style="left:29.2%;width:27.6%"></div>
+                <div class="absolute top-0 h-full w-0.5 bg-red-500/60 opacity-80" style="left:34%"></div>
+                <div class="absolute top-1 text-[9px] mono text-info" style="left:29.2%">$7.30</div>
+                <div class="absolute top-1 text-[9px] mono text-info" style="left:49%">$14.20</div>
+              </div>
+            </div>
+
+            <!-- DCF Exit Multiple -->
+            <div class="flex items-center gap-3">
+              <div class="w-44 shrink-0 text-right">
+                <div class="text-[11px] text-txt-secondary">DCF (Exit Multiple)</div>
+                <div class="text-[10px] text-txt-muted mono">$9.80 – $18.90</div>
+              </div>
+              <div class="flex-1 h-7 bg-surface rounded relative">
+                <div class="absolute h-full rounded bg-gradient-to-r from-info/50 to-info/70"
+                  style="left:39.2%;width:36.4%"></div>
+                <div class="absolute top-0 h-full w-0.5 bg-red-500/60 opacity-80" style="left:34%"></div>
+                <div class="absolute top-1 text-[9px] mono text-info" style="left:39.2%">$9.80</div>
+              </div>
+            </div>
+
+            <!-- Trading Comps -->
+            <div class="flex items-center gap-3">
+              <div class="w-44 shrink-0 text-right">
+                <div class="text-[11px] text-txt-secondary">Trading Comps</div>
+                <div class="text-[10px] text-txt-muted mono">$7.80 – $11.20</div>
+              </div>
+              <div class="flex-1 h-7 bg-surface rounded relative">
+                <div class="absolute h-full rounded bg-gradient-to-r from-warn-DEFAULT/50 to-warn-DEFAULT/70"
+                  style="left:31.2%;width:13.6%"></div>
+                <div class="absolute top-0 h-full w-0.5 bg-red-500/60 opacity-80" style="left:34%"></div>
+                <div class="absolute top-1 text-[9px] mono text-warn-DEFAULT" style="left:31.2%">$7.80</div>
+              </div>
+            </div>
+
+            <!-- Precedent Transactions -->
+            <div class="flex items-center gap-3">
+              <div class="w-44 shrink-0 text-right">
+                <div class="text-[11px] text-txt-secondary">Precedent Transactions</div>
+                <div class="text-[10px] text-txt-muted mono">$11.50 – $17.30</div>
+              </div>
+              <div class="flex-1 h-7 bg-surface rounded relative">
+                <div class="absolute h-full rounded bg-gradient-to-r from-pos-DEFAULT/50 to-pos-DEFAULT/70"
+                  style="left:46%;width:23.2%"></div>
+                <div class="absolute top-0 h-full w-0.5 bg-red-500/60 opacity-80" style="left:34%"></div>
+                <div class="absolute top-1 text-[9px] mono text-pos-text" style="left:46%">$11.50</div>
+              </div>
+            </div>
+
+            <!-- Current price legend -->
+            <div class="flex items-center gap-2 pl-48 mt-2">
+              <span class="inline-block w-0.5 h-3 bg-red-500/60"></span>
+              <span class="text-[10px] text-txt-muted">Current Price $8.50</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────── -->
+        <!-- AUDIT TRAIL PREVIEW                     -->
+        <!-- ─────────────────────────────────────── -->
+        <div class="bg-panel rounded-lg border border-border-subtle overflow-hidden">
+          <div class="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
+            <div>
+              <div class="text-[13px] font-semibold text-txt-primary">Audit Trail</div>
+              <div class="text-[11px] text-txt-muted mt-0.5">42 computation steps logged · 100% coverage · All checks
+                passed</div>
+            </div>
+            <button
+              class="px-3 py-1.5 rounded bg-surface border border-border-default text-[11px] text-txt-secondary hover:bg-elevated transition-colors">
+              View Full Trail →
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-[11px]">
+              <thead>
+                <tr class="bg-surface border-b border-border-subtle">
+                  <th class="text-left px-4 py-2 text-txt-muted font-medium">Step</th>
+                  <th class="text-left px-4 py-2 text-txt-muted font-medium">Formula</th>
+                  <th class="text-left px-4 py-2 text-txt-muted font-medium">Inputs</th>
+                  <th class="text-right px-4 py-2 text-txt-muted font-medium">Result</th>
+                  <th class="text-right px-4 py-2 text-txt-muted font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                  <td class="px-4 py-2 text-txt-secondary font-medium">Revenue Year 1</td>
+                  <td class="px-4 py-2 mono text-txt-muted">R₁ = R₀ × (1 + g₁)</td>
+                  <td class="px-4 py-2 mono text-txt-muted">R₀=$500M, g₁=10%</td>
+                  <td class="px-4 py-2 number-cell text-cell-formula">$550.0M</td>
+                  <td class="px-4 py-2 text-right"><span
+                      class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px]">✓</span></td>
+                </tr>
+                <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                  <td class="px-4 py-2 text-txt-secondary font-medium">EBITDA Year 1</td>
+                  <td class="px-4 py-2 mono text-txt-muted">EBITDA = R × m_EBITDA</td>
+                  <td class="px-4 py-2 mono text-txt-muted">R=$550M, m=25%</td>
+                  <td class="px-4 py-2 number-cell text-cell-formula">$137.5M</td>
+                  <td class="px-4 py-2 text-right"><span
+                      class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px]">✓</span></td>
+                </tr>
+                <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                  <td class="px-4 py-2 text-txt-secondary font-medium">NOPAT Year 1</td>
+                  <td class="px-4 py-2 mono text-txt-muted">NOPAT = EBIT × (1−τ)</td>
+                  <td class="px-4 py-2 mono text-txt-muted">EBIT=$110M, τ=21%</td>
+                  <td class="px-4 py-2 number-cell text-cell-formula">$86.9M</td>
+                  <td class="px-4 py-2 text-right"><span
+                      class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px]">✓</span></td>
+                </tr>
+                <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                  <td class="px-4 py-2 text-txt-secondary font-medium">UFCF Year 1</td>
+                  <td class="px-4 py-2 mono text-txt-muted">NOPAT+D&A−CapEx−ΔNWC</td>
+                  <td class="px-4 py-2 mono text-txt-muted">86.9+27.5−33.0−4.0</td>
+                  <td class="px-4 py-2 number-cell text-cell-output font-semibold">$77.4M</td>
+                  <td class="px-4 py-2 text-right"><span
+                      class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px]">✓</span></td>
+                </tr>
+                <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                  <td class="px-4 py-2 text-txt-secondary font-medium">Terminal Value GG</td>
+                  <td class="px-4 py-2 mono text-txt-muted">UFCF_T×(1+g)/(r−g)</td>
+                  <td class="px-4 py-2 mono text-txt-muted">110.2×1.025/0.075</td>
+                  <td class="px-4 py-2 number-cell text-cell-output font-semibold">$1,505.5M</td>
+                  <td class="px-4 py-2 text-right"><span
+                      class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px]">✓</span></td>
+                </tr>
+                <tr class="hover:bg-surface/40 transition-colors">
+                  <td class="px-4 py-2 text-txt-secondary font-medium">Enterprise Value</td>
+                  <td class="px-4 py-2 mono text-txt-muted">Σ PV(UFCF) + PV(TV)</td>
+                  <td class="px-4 py-2 mono text-txt-muted">316.2 + 785.8</td>
+                  <td class="px-4 py-2 number-cell text-cell-output font-bold text-[13px]">$1,102.0M</td>
+                  <td class="px-4 py-2 text-right"><span
+                      class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px]">✓</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-4 py-3 bg-surface border-t border-border-subtle flex items-center justify-between">
+            <span class="text-[11px] text-txt-muted mono">Showing 6 of 42 steps · <span class="text-pos-DEFAULT">0
+                errors</span> · <span class="text-warn-DEFAULT">1 warning</span></span>
+            <button
+              class="px-3 py-1 rounded bg-surface border border-border-default text-[11px] text-txt-secondary hover:bg-elevated transition-colors">Export
+              as JSON</button>
+          </div>
+        </div>
+
+      </div><!-- /px-6 py-5 -->
+    </main>
+  </div><!-- /flex -->
+</body>
+
+</html>

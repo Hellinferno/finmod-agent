@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FMVA — Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['IBM Plex Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        base: '#FFFFFF', panel: '#F8FAFC', surface: '#F1F5F9', elevated: '#FFFFFF',
+                        border: { subtle: '#E2E8F0', default: '#CBD5E1', focus: '#3B82F6' },
+                        txt: { primary: '#0F172A', secondary: '#475569', muted: '#94A3B8' },
+                        accent: { DEFAULT: '#3B82F6', hover: '#2563EB', subtle: '#EFF6FF' },
+                        pos: { DEFAULT: '#22C55E', bg: '#F0FDF4', text: '#15803D' },
+                        neg: { DEFAULT: '#EF4444', bg: '#FEF2F2', text: '#B91C1C' },
+                        warn: { DEFAULT: '#F59E0B', bg: '#FFFBEB' },
+                        cell: { input: '#2563EB', formula: '#0F172A', output: '#16A34A' },
+                    },
+                }
+            },
+        };
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #FFFFFF;
+            font-family: 'IBM Plex Sans', sans-serif;
+            margin: 0;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="bg-base text-txt-primary min-h-screen">
+
+    <!-- TOPBAR -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 h-14 bg-panel border-b border-border-subtle flex items-center px-4 gap-4">
+        <div class="flex items-center gap-2 shrink-0 w-[220px]">
+            <div class="w-7 h-7 rounded bg-accent flex items-center justify-center">
+                <span class="mono text-white font-bold text-[11px]">FV</span>
+            </div>
+            <span class="font-semibold text-[13px] text-txt-primary">FMVA</span>
+            <span class="text-border-default text-[10px] mono ml-1">v1.0</span>
+        </div>
+        <div class="flex items-center gap-0 ml-6 flex-1">
+            <div class="flex items-center gap-0 text-[11px]">
+                <a href="fmva-ingestion-screen.html"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle hover:bg-accent-subtle transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+                    <span class="text-txt-muted">Ingest</span>
+                </a>
+                <div class="w-6 h-px bg-border-subtle"></div>
+                <a href="fmva-assumptions-components.html"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle hover:bg-accent-subtle transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+                    <span class="text-txt-muted">Configure</span>
+                </a>
+                <div class="w-6 h-px bg-border-subtle"></div>
+                <a href="fmva-dcf-screen.html"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle hover:bg-accent-subtle transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+                    <span class="text-txt-muted">DCF</span>
+                </a>
+                <div class="w-6 h-px bg-border-subtle"></div>
+                <a href="fmva-sensitivity.html"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle hover:bg-accent-subtle transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+                    <span class="text-txt-muted">Sensitivity</span>
+                </a>
+                <div class="w-6 h-px bg-border-subtle"></div>
+                <a href="fmva-export.html"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-sm bg-surface border border-border-subtle hover:bg-accent-subtle transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full bg-border-default"></span>
+                    <span class="text-txt-muted">Export</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="flex pt-14 h-screen">
+        <!-- SIDEBAR -->
+        <aside class="w-[240px] shrink-0 bg-panel border-r border-border-subtle flex flex-col pt-4">
+            <div class="px-4 pb-4 border-b border-border-subtle">
+                <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium mb-1">FMVA Platform</div>
+                <div class="text-[14px] font-semibold text-txt-primary">Dashboard</div>
+                <div class="text-[11px] text-txt-muted mt-0.5">Overview & Quick Actions</div>
+            </div>
+            <nav class="px-2 py-4 space-y-1 flex-1">
+                <a href="fmva-dashboard.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium bg-accent-subtle border-l-2 border-accent text-accent">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="fmva-ingestion-screen.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <span>Data Ingestion</span>
+                </a>
+                <a href="fmva-model.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                    </svg>
+                    <span>3-Statement Model</span>
+                    <span
+                        class="ml-auto px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                </a>
+                <a href="fmva-assumptions-components.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <span>Assumptions</span>
+                </a>
+                <a href="fmva-dcf-screen.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>DCF Valuation</span>
+                </a>
+                <a href="fmva-comps.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Trading Comps</span>
+                    <span
+                        class="ml-auto px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                </a>
+                <a href="fmva-sensitivity.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span>Sensitivity</span>
+                    <span
+                        class="ml-auto px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                </a>
+
+                <div class="border-t border-border-subtle my-2 mx-2"></div>
+                <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium px-2 mb-1 mt-2">Quality
+                </div>
+
+                <a href="fmva-audit.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Audit Trail</span>
+                    <span
+                        class="ml-auto px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                </a>
+                <a href="fmva-export.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface hover:text-txt-primary transition-colors">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Export</span>
+                    <span
+                        class="ml-auto px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                </a>
+            </nav>
+            <!-- Session footer -->
+            <div class="px-4 py-3 border-t border-border-subtle">
+                <div class="text-[10px] text-txt-muted mb-1.5">Session · <span class="mono">2026-02-23</span></div>
+                <div class="flex items-center justify-between">
+                    <div class="text-[11px] text-txt-secondary">Status: <span class="text-pos-DEFAULT">Ready</span>
+                    </div>
+                    <div class="text-[10px] mono text-txt-muted">v1.0</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto bg-base">
+            <!-- PAGE HEADER -->
+            <div class="sticky top-0 z-10 bg-base/95 backdrop-blur-sm border-b border-border-subtle px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-[18px] font-semibold text-txt-primary">Dashboard</h1>
+                        <p class="text-[12px] text-txt-muted">Platform overview · Recent valuations · Quick actions</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="fmva-ingestion-screen.html"
+                            class="px-4 py-1.5 rounded bg-accent text-white text-[12px] font-semibold hover:bg-accent-hover transition-colors">
+                            + New Valuation
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-5 space-y-5">
+
+                <!-- WELCOME CARD -->
+                <div class="bg-accent-subtle rounded-lg border border-accent/20 p-6">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h2 class="text-[16px] font-semibold text-txt-primary mb-1">Welcome to FMVA</h2>
+                            <p class="text-[13px] text-txt-secondary max-w-xl">Financial Modeling & Valuation Agent —
+                                AI-augmented institutional-grade company valuations. Automated DCF, Comparable Company
+                                Analysis, Sensitivity Matrices, and LLM-generated narratives.</p>
+                        </div>
+                        <div class="shrink-0 w-12 h-12 rounded-lg bg-accent flex items-center justify-center">
+                            <span class="mono text-white font-bold text-[16px]">FV</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK STATS -->
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Active Session</div>
+                        <div class="mono text-[22px] font-bold text-accent">1</div>
+                        <div class="text-[10px] text-txt-muted mt-1">TechCorp Inc.</div>
+                    </div>
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Test Coverage</div>
+                        <div class="mono text-[22px] font-bold text-cell-output">40/40</div>
+                        <div class="text-[10px] text-pos-DEFAULT mt-1">All passing</div>
+                    </div>
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Modules Ready</div>
+                        <div class="mono text-[22px] font-bold text-txt-primary">5/7</div>
+                        <div class="text-[10px] text-txt-muted mt-1">Phases complete</div>
+                    </div>
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="text-[10px] text-txt-muted uppercase tracking-widest mb-1">Export Formats</div>
+                        <div class="mono text-[22px] font-bold text-txt-primary">3</div>
+                        <div class="text-[10px] text-txt-muted mt-1">XLSX · JSON · PDF</div>
+                    </div>
+                </div>
+
+                <!-- RECENT VALUATION -->
+                <div class="bg-panel rounded-lg border border-border-subtle overflow-hidden">
+                    <div class="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
+                        <div>
+                            <div class="text-[13px] font-semibold text-txt-primary">Recent Valuations</div>
+                            <div class="text-[11px] text-txt-muted mt-0.5">Your most recent analysis sessions</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-[12px]">
+                            <thead>
+                                <tr class="bg-surface border-b border-border-subtle">
+                                    <th class="text-left px-4 py-2.5 text-txt-muted font-medium">Company</th>
+                                    <th class="text-left px-4 py-2.5 text-txt-muted font-medium">Ticker</th>
+                                    <th class="text-right px-4 py-2.5 text-txt-muted font-medium">Implied Price</th>
+                                    <th class="text-right px-4 py-2.5 text-txt-muted font-medium">EV ($M)</th>
+                                    <th class="text-center px-4 py-2.5 text-txt-muted font-medium">Scenario</th>
+                                    <th class="text-center px-4 py-2.5 text-txt-muted font-medium">Status</th>
+                                    <th class="text-right px-4 py-2.5 text-txt-muted font-medium">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-txt-primary">TechCorp Inc.</td>
+                                    <td class="px-4 py-3 mono text-txt-secondary">TECH</td>
+                                    <td class="px-4 py-3 mono text-right text-accent font-semibold">$9.52</td>
+                                    <td class="px-4 py-3 mono text-right text-cell-output">$1,102</td>
+                                    <td class="px-4 py-3 text-center"><span
+                                            class="px-2 py-0.5 rounded bg-accent-subtle text-accent text-[10px] font-medium">Base</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center"><span
+                                            class="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[10px]">✓
+                                            Complete</span></td>
+                                    <td class="px-4 py-3 mono text-right text-txt-muted text-[11px]">2026-02-23</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PIPELINE OVERVIEW -->
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- Working Pages -->
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-2 h-2 rounded-full bg-pos-DEFAULT"></span>
+                            <span class="text-[13px] font-semibold text-txt-primary">Active Pages</span>
+                        </div>
+                        <div class="space-y-2 text-[12px]">
+                            <a href="fmva-ingestion-screen.html"
+                                class="flex items-center justify-between py-1 hover:text-accent transition-colors">
+                                <span class="text-txt-secondary">Data Ingestion</span>
+                                <span
+                                    class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px] mono">Live</span>
+                            </a>
+                            <a href="fmva-assumptions-components.html"
+                                class="flex items-center justify-between py-1 hover:text-accent transition-colors">
+                                <span class="text-txt-secondary">Assumptions Engine</span>
+                                <span
+                                    class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px] mono">Live</span>
+                            </a>
+                            <a href="fmva-dcf-screen.html"
+                                class="flex items-center justify-between py-1 hover:text-accent transition-colors">
+                                <span class="text-txt-secondary">DCF Valuation</span>
+                                <span
+                                    class="px-1.5 py-0.5 rounded-full bg-pos-bg text-pos-text text-[9px] mono">Live</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Coming Soon Pages -->
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-2 h-2 rounded-full bg-accent"></span>
+                            <span class="text-[13px] font-semibold text-txt-primary">Coming Soon</span>
+                        </div>
+                        <div class="space-y-2 text-[12px]">
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">3-Statement Model</span>
+                                <span
+                                    class="px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                            </div>
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">Trading Comps</span>
+                                <span
+                                    class="px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                            </div>
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">Sensitivity Analysis</span>
+                                <span
+                                    class="px-1.5 py-0.5 rounded-full bg-accent-subtle text-accent text-[9px] mono">Soon</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backend Capabilities -->
+                    <div class="bg-panel rounded-lg border border-border-subtle p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-2 h-2 rounded-full bg-cell-output"></span>
+                            <span class="text-[13px] font-semibold text-txt-primary">Backend Ready</span>
+                        </div>
+                        <div class="space-y-2 text-[12px]">
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">DCF Engine</span>
+                                <span class="mono text-[10px] text-pos-DEFAULT">✓</span>
+                            </div>
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">Comps Analysis</span>
+                                <span class="mono text-[10px] text-pos-DEFAULT">✓</span>
+                            </div>
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">Sensitivity Matrix</span>
+                                <span class="mono text-[10px] text-pos-DEFAULT">✓</span>
+                            </div>
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">Audit Trail</span>
+                                <span class="mono text-[10px] text-pos-DEFAULT">✓</span>
+                            </div>
+                            <div class="flex items-center justify-between py-1">
+                                <span class="text-txt-secondary">XLSX/JSON Export</span>
+                                <span class="mono text-[10px] text-pos-DEFAULT">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

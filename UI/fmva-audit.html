@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FMVA — Audit Trail</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['IBM Plex Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        base: '#FFFFFF', panel: '#F8FAFC', surface: '#F1F5F9', elevated: '#FFFFFF',
+                        border: { subtle: '#E2E8F0', default: '#CBD5E1', focus: '#3B82F6' },
+                        txt: { primary: '#0F172A', secondary: '#475569', muted: '#94A3B8' },
+                        accent: { DEFAULT: '#3B82F6', hover: '#2563EB', subtle: '#EFF6FF' },
+                        pos: { DEFAULT: '#22C55E', bg: '#F0FDF4', text: '#15803D' },
+                        neg: { DEFAULT: '#EF4444', bg: '#FEF2F2', text: '#B91C1C' },
+                        warn: { DEFAULT: '#F59E0B', bg: '#FFFBEB' },
+                        cell: { input: '#2563EB', formula: '#0F172A', output: '#16A34A' },
+                    },
+                }
+            },
+        };
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #FFFFFF;
+            font-family: 'IBM Plex Sans', sans-serif;
+            margin: 0;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-base text-txt-primary min-h-screen">
+    <header
+        class="fixed top-0 left-0 right-0 z-50 h-14 bg-panel border-b border-border-subtle flex items-center px-4 gap-4">
+        <a href="fmva-dashboard.html" class="flex items-center gap-2 shrink-0 w-[220px]">
+            <div class="w-7 h-7 rounded bg-accent flex items-center justify-center"><span
+                    class="mono text-white font-bold text-[11px]">FV</span></div>
+            <span class="font-semibold text-[13px] text-txt-primary">FMVA</span>
+            <span class="text-border-default text-[10px] mono ml-1">v1.0</span>
+        </a>
+        <div class="flex items-center gap-1.5 text-[12px] text-txt-muted">
+            <span>TechCorp Inc.</span><span class="text-border-default">/</span><span class="text-txt-primary">Audit
+                Trail</span>
+        </div>
+    </header>
+    <div class="flex pt-14 h-screen">
+        <aside class="w-[240px] shrink-0 bg-panel border-r border-border-subtle flex flex-col pt-4">
+            <div class="px-4 pb-4 border-b border-border-subtle">
+                <div class="text-[10px] text-txt-muted uppercase tracking-widest font-medium mb-1">Subject Company</div>
+                <div class="text-[14px] font-semibold text-txt-primary">TechCorp Inc.</div>
+            </div>
+            <nav class="px-2 py-4 space-y-1 flex-1">
+                <a href="fmva-dashboard.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">Dashboard</a>
+                <a href="fmva-ingestion-screen.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">Data
+                    Ingestion</a>
+                <a href="fmva-assumptions-components.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">Assumptions</a>
+                <a href="fmva-dcf-screen.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">DCF
+                    Valuation</a>
+                <a href="fmva-comps.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">Trading
+                    Comps</a>
+                <a href="fmva-sensitivity.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">Sensitivity</a>
+                <div class="border-t border-border-subtle my-2 mx-2"></div>
+                <a href="fmva-audit.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium bg-accent-subtle border-l-2 border-accent text-accent">Audit
+                    Trail</a>
+                <a href="fmva-export.html"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-txt-secondary hover:bg-surface transition-colors">Export</a>
+            </nav>
+        </aside>
+        <main class="flex-1 overflow-y-auto bg-base">
+            <div class="sticky top-0 z-10 bg-base/95 backdrop-blur-sm border-b border-border-subtle px-6 py-4">
+                <div class="flex items-center gap-2 mb-0.5">
+                    <h1 class="text-[18px] font-semibold text-txt-primary">Audit Trail</h1>
+                    <span
+                        class="px-2 py-0.5 rounded-full bg-accent-subtle text-accent text-[11px] font-medium mono">COMING
+                        SOON</span>
+                </div>
+                <p class="text-[12px] text-txt-muted">Calculation log · Integrity checks · Error/Warning log</p>
+            </div>
+            <div class="px-6 py-16 flex flex-col items-center justify-center text-center max-w-lg mx-auto">
+                <div
+                    class="w-16 h-16 rounded-xl bg-accent-subtle border border-accent/20 flex items-center justify-center mb-5">
+                    <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-[20px] font-semibold text-txt-primary mb-2">Audit Trail</h2>
+                <p class="text-[13px] text-txt-secondary mb-6">The full Audit Trail page is under development. A preview
+                    is already available in the DCF Valuation page.</p>
+                <div class="bg-panel rounded-lg border border-border-subtle p-4 w-full text-left">
+                    <div class="text-[12px] font-semibold text-txt-primary mb-2">Planned Features</div>
+                    <div class="space-y-2 text-[12px] text-txt-secondary">
+                        <div class="flex items-center gap-2"><span class="text-accent">○</span> Full computation step
+                            log with formulas</div>
+                        <div class="flex items-center gap-2"><span class="text-accent">○</span> Integrity check
+                            dashboard (pass/fail)</div>
+                        <div class="flex items-center gap-2"><span class="text-accent">○</span> Error and warning log
+                            with resolutions</div>
+                        <div class="flex items-center gap-2"><span class="text-accent">○</span> Hover-to-inspect formula
+                            tooltips</div>
+                        <div class="flex items-center gap-2"><span class="text-accent">○</span> Export audit trail to
+                            JSON/PDF</div>
+                    </div>
+                </div>
+                <a href="fmva-dcf-screen.html"
+                    class="mt-6 px-6 py-2 rounded bg-accent text-white text-[13px] font-semibold hover:bg-accent-hover transition-colors">View
+                    DCF (includes audit preview) →</a>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
