@@ -6,17 +6,16 @@ run_full_pipeline(): ingest → normalize → validate → DCF → export
 
 from __future__ import annotations
 from pathlib import Path
-from typing import Any, Optional
+
 from loguru import logger
 from fmva.audit.trail import AuditTrail
 from fmva.core.ingestion import load_json
 from fmva.core.normalization import normalize
 from fmva.core.validation import validate
 from fmva.core.checker import check_all_balance_sheets
-from fmva.core.schemas import AssumptionSet, FinancialStatements, ValuationResult
+from fmva.core.schemas import AssumptionSet, ValuationResult
 from fmva.engines.assumptions import get_preset
 from fmva.engines.dcf import run_full_dcf
-from fmva.engines.wacc import calculate_wacc
 from fmva.export.excel_exporter import export_to_excel
 from fmva.export.json_exporter import export_to_json
 from fmva.exceptions import FMVAError, BalanceSheetError
@@ -101,7 +100,9 @@ def run_full_pipeline(
         stats = calculate_comps_stats(comp_data)
         latest_is = financials.latest_income_statement
         if latest_is and latest_is.ebitda and latest_is.revenue:
-            comps_result = apply_comps_multiples(stats, latest_is.ebitda, latest_is.revenue, audit)
+            comps_result = apply_comps_multiples(
+                stats, latest_is.ebitda, latest_is.revenue, comp_data, audit
+            )
 
     # ── Step 6: Export ─────────────────────────────────────────────────────
     logger.info("Step 6/6: Exporting results...")

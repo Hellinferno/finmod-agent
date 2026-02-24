@@ -29,9 +29,7 @@ class FileFormatError(IngestionError):
     """Raised for unsupported or malformed file formats."""
 
     def __init__(self, message: str, details: dict = None):
-        self.error_code = "FILE_FORMAT_ERROR"
-        Exception.__init__(self, f"[FILE_FORMAT_ERROR] {message}")
-        self.details = details or {}
+        FMVAError.__init__(self, message, error_code="FILE_FORMAT_ERROR", details=details)
 
 
 # ── Normalization Errors ───────────────────────────────────────────────────────
@@ -49,9 +47,12 @@ class FieldMappingError(NormalizationError):
 
     def __init__(self, field_name: str, available_fields: list[str] = None):
         details = {"field": field_name, "available": available_fields or []}
-        self.error_code = "FIELD_MAPPING_ERROR"
-        Exception.__init__(self, f"[FIELD_MAPPING_ERROR] Cannot map field: '{field_name}'")
-        self.details = details
+        FMVAError.__init__(
+            self,
+            f"Cannot map field: '{field_name}'",
+            error_code="FIELD_MAPPING_ERROR",
+            details=details,
+        )
 
 
 # ── Validation Errors ──────────────────────────────────────────────────────────
@@ -60,9 +61,15 @@ class FieldMappingError(NormalizationError):
 class ValidationError(FMVAError):
     """Raised when normalized data fails integrity checks."""
 
-    def __init__(self, message: str, errors: list[str] = None, details: dict = None):
+    def __init__(
+        self,
+        message: str,
+        errors: list[str] = None,
+        details: dict = None,
+        error_code: str = "VALIDATION_ERROR",
+    ):
         self.validation_errors = errors or []
-        super().__init__(message, error_code="VALIDATION_ERROR", details=details)
+        super().__init__(message, error_code=error_code, details=details)
 
 
 class BalanceSheetError(ValidationError):
@@ -74,8 +81,7 @@ class BalanceSheetError(ValidationError):
             f"Balance sheet imbalance: Assets - (Liabilities + Equity) = ${delta:,.2f}M. "
             f"This exceeds the $0.01M tolerance. Downstream computation is blocked."
         )
-        super().__init__(message, details=details)
-        self.error_code = "BALANCE_SHEET_ERROR"
+        super().__init__(message, details=details, error_code="BALANCE_SHEET_ERROR")
 
 
 # ── Computation Errors ─────────────────────────────────────────────────────────
@@ -84,8 +90,8 @@ class BalanceSheetError(ValidationError):
 class ComputationError(FMVAError):
     """Raised for errors in the valuation computation pipeline."""
 
-    def __init__(self, message: str, details: dict = None):
-        super().__init__(message, error_code="COMPUTATION_ERROR", details=details)
+    def __init__(self, message: str, details: dict = None, error_code: str = "COMPUTATION_ERROR"):
+        super().__init__(message, error_code=error_code, details=details)
 
 
 class GordonGrowthError(ComputationError):
@@ -96,8 +102,11 @@ class GordonGrowthError(ComputationError):
             f"Gordon Growth Model invalid: WACC ({wacc:.2%}) must be strictly greater "
             f"than Terminal Growth Rate ({tgr:.2%})."
         )
-        super().__init__(message, details={"wacc": wacc, "tgr": tgr})
-        self.error_code = "GORDON_GROWTH_ERROR"
+        super().__init__(
+            message,
+            details={"wacc": wacc, "tgr": tgr},
+            error_code="GORDON_GROWTH_ERROR",
+        )
 
 
 class WACCBoundsError(ComputationError):
@@ -105,8 +114,7 @@ class WACCBoundsError(ComputationError):
 
     def __init__(self, wacc: float):
         message = f"WACC ({wacc:.2%}) is outside valid bounds (5%–25%)."
-        super().__init__(message, details={"wacc": wacc})
-        self.error_code = "WACC_BOUNDS_ERROR"
+        super().__init__(message, details={"wacc": wacc}, error_code="WACC_BOUNDS_ERROR")
 
 
 # ── Export Errors ──────────────────────────────────────────────────────────────
@@ -125,8 +133,8 @@ class ExportError(FMVAError):
 class LLMError(FMVAError):
     """Raised when LLM loading or inference fails."""
 
-    def __init__(self, message: str, details: dict = None):
-        super().__init__(message, error_code="LLM_ERROR", details=details)
+    def __init__(self, message: str, details: dict = None, error_code: str = "LLM_ERROR"):
+        super().__init__(message, error_code=error_code, details=details)
 
 
 class HallucinationError(LLMError):
@@ -138,5 +146,4 @@ class HallucinationError(LLMError):
             f"Hallucination detected: {len(flagged_numbers)} number(s) in the narrative "
             f"do not match computed model outputs within ±5% tolerance."
         )
-        super().__init__(message, details=details)
-        self.error_code = "HALLUCINATION_ERROR"
+        super().__init__(message, details=details, error_code="HALLUCINATION_ERROR")

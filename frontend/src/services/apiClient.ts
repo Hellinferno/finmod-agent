@@ -9,7 +9,11 @@ export const apiClient = axios.create({
 apiClient.interceptors.response.use(
     (response) => response.data,
     (error) => {
-        console.error("API Error: ", error.response?.data?.message || error.message);
+        const apiMessage =
+            error.response?.data?.message ||
+            error.response?.data?.detail ||
+            error.message;
+        console.error("API Error: ", apiMessage);
         return Promise.reject(error);
     }
 );

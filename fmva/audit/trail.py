@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import Any, Optional
 
@@ -121,18 +121,47 @@ class AuditTrail:
         return df
 
 
-class NullAudit(AuditTrail):
-    """A no-op audit trail for performance-sensitive contexts (e.g., sensitivity matrix)."""
+class NullAudit:
+    """
+    No-op audit implementation for lightweight runs where logging is disabled.
 
-    def log(self, step, formula, inputs, output, unit="$M", module="general") -> AuditEntry:
-        """No-op: does not store entries."""
-        return AuditEntry(
-            entry_id="null",
-            timestamp="",
-            step=step,
-            module=module,
-            formula=formula,
-            inputs=inputs,
-            output=output,
-            unit=unit,
-        )
+    Implements the same interface as AuditTrail but stores nothing.
+    """
+
+    def __init__(self):
+        self.session_id = "null"
+        self.company_name = ""
+        self.created_at = datetime.utcnow().isoformat()
+
+    def log(
+        self,
+        step: str,
+        formula: str,
+        inputs: dict[str, Any],
+        output: float,
+        unit: str = "$M",
+        module: str = "general",
+    ) -> None:
+        return None
+
+    @property
+    def entries(self) -> tuple[AuditEntry, ...]:
+        return ()
+
+    def __len__(self) -> int:
+        return 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "session_id": self.session_id,
+            "company": self.company_name,
+            "generated_at": self.created_at,
+            "n_entries": 0,
+            "entries": [],
+        }
+
+    def export_json(self, filepath: str) -> None:
+        return None
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(columns=["step", "module", "formula", "inputs", "output", "unit"])

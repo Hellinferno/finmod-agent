@@ -3,7 +3,7 @@ Comparable company analysis engine — fetch data via yfinance, compute multiple
 """
 
 from __future__ import annotations
-import json, os
+import json
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional
@@ -85,6 +85,10 @@ def calculate_comps_stats(
     comps: list[CompData], sigma: float = OUTLIER_SIGMA_THRESHOLD,
 ) -> CompsStats:
     """Calculate min, 25th, median, 75th, max for each multiple with outlier exclusion."""
+    if len(comps) < MIN_COMPARABLE_COMPANIES:
+        logger.warning(
+            f"Peer set has {len(comps)} companies; recommended minimum is {MIN_COMPARABLE_COMPANIES}"
+        )
     multiples_data = {"ev_ebitda": [], "ev_revenue": [], "pe_ratio": []}
     for c in comps:
         if c.ev_ebitda is not None: multiples_data["ev_ebitda"].append(c.ev_ebitda)
@@ -114,6 +118,7 @@ def calculate_comps_stats(
 
 def apply_comps_multiples(
     stats: CompsStats, target_ebitda: float, target_revenue: float,
+    comps: list[CompData] | None = None,
     audit: AuditTrail = None,
 ) -> CompsResult:
     """Apply median comp multiples to target company's EBITDA/revenue for implied EV range."""
@@ -131,6 +136,7 @@ def apply_comps_multiples(
         return None
 
     return CompsResult(
+        comps=comps or [],
         stats=stats,
         implied_ev_ebitda_low=_implied(ev_ebitda.get("p25"), target_ebitda, "EV/EBITDA_p25"),
         implied_ev_ebitda_median=_implied(ev_ebitda.get("median"), target_ebitda, "EV/EBITDA_med"),

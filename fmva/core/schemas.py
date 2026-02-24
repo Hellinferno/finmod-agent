@@ -16,7 +16,7 @@ from datetime import datetime
 from typing import Any, Optional
 from enum import Enum
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field
 
 
 # ── Enums ──────────────────────────────────────────────────────────────────────
@@ -197,15 +197,20 @@ class FinancialStatements(BaseModel):
     @property
     def latest_year(self) -> int:
         """The most recent fiscal year in the data."""
-        return max(self.historical_years)
+        years = self.historical_years
+        if not years:
+            raise ValueError("No financial statement years available")
+        return max(years)
 
     @property
     def latest_income_statement(self) -> Optional[IncomeStatement]:
-        return self.income_statements.get(self.latest_year)
+        years = self.historical_years
+        return self.income_statements.get(max(years)) if years else None
 
     @property
     def latest_balance_sheet(self) -> Optional[BalanceSheet]:
-        return self.balance_sheets.get(self.latest_year)
+        years = self.historical_years
+        return self.balance_sheets.get(max(years)) if years else None
 
 
 # ── Validation & Check Results ─────────────────────────────────────────────────

@@ -6,7 +6,6 @@ Users may override these at runtime via AssumptionSet or notebook config cells.
 """
 
 from pathlib import Path
-from dataclasses import dataclass, field
 from typing import Optional
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
@@ -20,21 +19,12 @@ MODEL_DIR = PROJECT_ROOT / "models"
 
 # Google Drive paths (used when running in Colab)
 DRIVE_ROOT = "/content/drive/MyDrive/valuation_agent"
-DRIVE_DATA_DIR = f"{DRIVE_ROOT}/data"
-DRIVE_OUTPUT_DIR = f"{DRIVE_ROOT}/outputs"
-DRIVE_LOG_DIR = f"{DRIVE_ROOT}/logs"
-DRIVE_MODEL_DIR = f"{DRIVE_ROOT}/models"
-DRIVE_CACHE_DIR = f"{DRIVE_ROOT}/cache/yfinance"
 
 # ── Numerical Precision ────────────────────────────────────────────────────────
 BALANCE_SHEET_TOLERANCE = 0.01  # $0.01M tolerance for A = L + E check
 EBITDA_CONSISTENCY_TOLERANCE = 0.005  # ±0.5% for EBITDA = EBIT + D&A
 CASH_FLOW_REASONABLENESS_TOLERANCE = 0.10  # ±10% for OCF vs NI+D&A±ΔWC
 DCF_CROSS_VALIDATION_TOLERANCE = 0.001  # ±0.1% for DCF vs manual Excel
-DISPLAY_CURRENCY_DECIMALS = 2
-DISPLAY_PERCENT_DECIMALS = 1
-INTERNAL_MARGIN_DECIMALS = 4
-DISCOUNT_FACTOR_DECIMALS = 8
 
 # ── WACC Bounds ────────────────────────────────────────────────────────────────
 WACC_MIN = 0.05  # 5%
@@ -42,12 +32,6 @@ WACC_MAX = 0.25  # 25%
 DEFAULT_BETA = 1.0  # Used when yfinance beta is unavailable
 DEFAULT_RISK_FREE_RATE = 0.045  # 4.5%
 DEFAULT_EQUITY_RISK_PREMIUM = 0.055  # 5.5%
-
-# ── Terminal Value ─────────────────────────────────────────────────────────────
-TGR_WARNING_THRESHOLD = 0.04  # Warn if TGR > 4%
-TGR_ERROR_THRESHOLD = 0.05  # Error if TGR > 5%
-TV_HIGH_WARNING_PCT = 80  # Warn if TV > 80% of EV
-TV_EXTREME_WARNING_PCT = 95  # Extreme warning if TV > 95% of EV
 
 # ── Comps ──────────────────────────────────────────────────────────────────────
 MIN_COMPARABLE_COMPANIES = 3
@@ -72,12 +56,7 @@ LLM_TEMPERATURES = {
 # ── Reproducibility ────────────────────────────────────────────────────────────
 RANDOM_SEED = 42
 
-# ── Performance Targets ────────────────────────────────────────────────────────
-MAX_PIPELINE_TIME_NO_LLM_SECS = 60
-MAX_PIPELINE_TIME_WITH_LLM_SECS = 360
-MAX_MODEL_LOAD_TIME_SECS = 90
-MAX_NARRATIVE_SECTION_TIME_SECS = 60
-
+from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class FMVAConfig:

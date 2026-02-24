@@ -18,7 +18,7 @@ const mockSubject = {
 };
 
 export default function CompsScreen() {
-    const [comps, setComps] = useState(mockComps);
+    const [comps] = useState(mockComps);
     const [newTicker, setNewTicker] = useState("");
 
     // Calculated fields per comp
@@ -29,30 +29,30 @@ export default function CompsScreen() {
     }));
 
     // Summary Statistics
-    const evRevSorted = [...compsWithMultiples].sort((a, b) => a.evRev - b.evRev);
-    const evEbitdaSorted = [...compsWithMultiples].sort((a, b) => a.evEbitda - b.evEbitda);
+    const evRevSorted = [...compsWithMultiples].sort((a, b) => Number(a.evRev) - Number(b.evRev));
+    const evEbitdaSorted = [...compsWithMultiples].sort((a, b) => Number(a.evEbitda) - Number(b.evEbitda));
 
-    const calcMedian = (arr: any[], key: string) => {
+    const calcMedian = (arr: Array<Record<string, unknown>>, key: string) => {
         const mid = Math.floor(arr.length / 2);
-        return arr.length % 2 !== 0 ? arr[mid][key] : (arr[mid - 1][key] + arr[mid][key]) / 2;
+        return arr.length % 2 !== 0 ? Number(arr[mid][key]) : (Number(arr[mid - 1][key]) + Number(arr[mid][key])) / 2;
     };
 
     const stats = {
         mean: {
-            evRev: compsWithMultiples.reduce((sum, c) => sum + c.evRev, 0) / comps.length,
-            evEbitda: compsWithMultiples.reduce((sum, c) => sum + c.evEbitda, 0) / comps.length,
+            evRev: compsWithMultiples.reduce((sum, c) => sum + Number(c.evRev), 0) / comps.length,
+            evEbitda: compsWithMultiples.reduce((sum, c) => sum + Number(c.evEbitda), 0) / comps.length,
         },
         median: {
             evRev: calcMedian(evRevSorted, 'evRev'),
             evEbitda: calcMedian(evEbitdaSorted, 'evEbitda'),
         },
         min: {
-            evRev: evRevSorted[0]?.evRev || 0,
-            evEbitda: evEbitdaSorted[0]?.evEbitda || 0,
+            evRev: Number(evRevSorted[0]?.evRev) || 0,
+            evEbitda: Number(evEbitdaSorted[0]?.evEbitda) || 0,
         },
         max: {
-            evRev: evRevSorted[evRevSorted.length - 1]?.evRev || 0,
-            evEbitda: evEbitdaSorted[evEbitdaSorted.length - 1]?.evEbitda || 0,
+            evRev: Number(evRevSorted[evRevSorted.length - 1]?.evRev) || 0,
+            evEbitda: Number(evEbitdaSorted[evEbitdaSorted.length - 1]?.evEbitda) || 0,
         }
     };
 
@@ -117,9 +117,9 @@ export default function CompsScreen() {
                                         <td className="px-4 py-2 mono text-right text-txt-secondary">${c.ev.toLocaleString()}</td>
                                         <td className="px-4 py-2 mono text-right text-txt-secondary">${c.rev.toLocaleString()}</td>
                                         <td className="px-4 py-2 mono text-right text-txt-secondary">${c.ebitda.toLocaleString()}</td>
-                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium border-l border-border-subtle bg-accent/5">{c.evRev.toFixed(1)}x</td>
-                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium bg-accent/5">{c.evEbitda.toFixed(1)}x</td>
-                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium bg-accent/5">{c.pe.toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium border-l border-border-subtle bg-accent/5">{Number(c.evRev).toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium bg-accent/5">{Number(c.evEbitda).toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium bg-accent/5">{Number(c.pe).toFixed(1)}x</td>
                                         <td className="px-4 py-2 text-right">
                                             <button className="text-txt-muted hover:text-neg-DEFAULT transition-colors">
                                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -136,37 +136,44 @@ export default function CompsScreen() {
 
                 {/* Bottom Row: Stats & Implied Valuation */}
                 <div className="grid grid-cols-2 gap-5">
-                    {/* Peer Statistics */}
-                    <div className="bg-panel rounded-lg border border-border-subtle overflow-hidden">
-                        <div className="px-4 py-3 border-b border-border-subtle">
-                            <h2 className="text-[13px] font-semibold text-txt-primary">Peer Group Statistics</h2>
+                    {/* Summary Statistics */}
+                    <div className="bg-panel rounded-lg border border-border-subtle p-6">
+                        <h2 className="text-[14px] font-semibold text-txt-primary mb-4">Summary Statistics</h2>
+                        <div className="grid grid-cols-2 gap-6">
+                            {/* Mean / Median */}
+                            <table className="w-full text-[12px] whitespace-nowrap">
+                                <thead>
+                                    <tr className="border-b border-border-subtle bg-surface/50">
+                                        <th className="text-left px-4 py-2 font-semibold text-txt-secondary uppercase tracking-wider text-[10px]">Metric</th>
+                                        <th className="text-right px-4 py-2 font-semibold text-txt-secondary uppercase tracking-wider text-[10px]">EV / Rev</th>
+                                        <th className="text-right px-4 py-2 font-semibold text-txt-secondary uppercase tracking-wider text-[10px]">EV / EBITDA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-border-subtle/50">
+                                        <td className="px-4 py-2 text-txt-secondary">Mean</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium">{Number(stats.mean.evRev).toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-primary font-medium">{Number(stats.mean.evEbitda).toFixed(1)}x</td>
+                                    </tr>
+                                    <tr className="border-b border-border-subtle/50 bg-accent/5">
+                                        <td className="px-4 py-2 text-txt-primary font-semibold">Median</td>
+                                        <td className="px-4 py-2 mono text-right text-accent font-bold">{Number(stats.median.evRev).toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-accent font-bold">{Number(stats.median.evEbitda).toFixed(1)}x</td>
+                                    </tr>
+                                    <tr className="border-b border-border-subtle/50">
+                                        <td className="px-4 py-2 text-txt-secondary">Min</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-secondary">{Number(stats.min.evRev).toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-secondary">{Number(stats.min.evEbitda).toFixed(1)}x</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="px-4 py-2 text-txt-secondary">Max</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-secondary">{Number(stats.max.evRev).toFixed(1)}x</td>
+                                        <td className="px-4 py-2 mono text-right text-txt-secondary">{Number(stats.max.evEbitda).toFixed(1)}x</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <table className="w-full text-[12px]">
-                            <tbody>
-                                <tr className="border-b border-border-subtle/50">
-                                    <td className="px-4 py-2 text-txt-secondary">Mean</td>
-                                    <td className="px-4 py-2 mono text-right text-txt-primary font-medium">{stats.mean.evRev.toFixed(1)}x</td>
-                                    <td className="px-4 py-2 mono text-right text-txt-primary font-medium">{stats.mean.evEbitda.toFixed(1)}x</td>
-                                </tr>
-                                <tr className="border-b border-border-subtle/50 bg-accent/5">
-                                    <td className="px-4 py-2 text-txt-primary font-semibold">Median</td>
-                                    <td className="px-4 py-2 mono text-right text-accent font-bold">{stats.median.evRev.toFixed(1)}x</td>
-                                    <td className="px-4 py-2 mono text-right text-accent font-bold">{stats.median.evEbitda.toFixed(1)}x</td>
-                                </tr>
-                                <tr className="border-b border-border-subtle/50">
-                                    <td className="px-4 py-2 text-txt-secondary">Min</td>
-                                    <td className="px-4 py-2 mono text-right text-txt-secondary">{stats.min.evRev.toFixed(1)}x</td>
-                                    <td className="px-4 py-2 mono text-right text-txt-secondary">{stats.min.evEbitda.toFixed(1)}x</td>
-                                </tr>
-                                <tr>
-                                    <td className="px-4 py-2 text-txt-secondary">Max</td>
-                                    <td className="px-4 py-2 mono text-right text-txt-secondary">{stats.max.evRev.toFixed(1)}x</td>
-                                    <td className="px-4 py-2 mono text-right text-txt-secondary">{stats.max.evEbitda.toFixed(1)}x</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
-
                     {/* Implied Valuation */}
                     <div className="bg-panel rounded-lg border border-border-subtle overflow-hidden">
                         <div className="px-4 py-3 border-b border-border-subtle flex justify-between items-center">
@@ -193,7 +200,7 @@ export default function CompsScreen() {
                             <div className="flex justify-between items-center pt-2">
                                 <div className="flex flex-col">
                                     <span className="text-[13px] font-bold text-txt-primary">Implied Share Price</span>
-                                    <span className="text-[10px] text-txt-muted w-[${mockSubject.shares}M shares]">{mockSubject.shares}M diluted shares</span>
+                                    <span className="text-[10px] text-txt-muted">{mockSubject.shares}M diluted shares</span>
                                 </div>
                                 <span className="mono text-[20px] font-bold text-pos-DEFAULT">${impliedPrice.toFixed(2)}</span>
                             </div>

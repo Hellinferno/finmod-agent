@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DataTable from '../components/DataTable';
 
 const tabs = ["Income Statement", "Balance Sheet", "Cash Flow"];
 
@@ -82,8 +83,8 @@ export default function ModelScreen() {
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-4 py-2 text-[13px] font-medium border-b-2 transition-colors ${activeTab === tab
-                                    ? 'border-accent text-accent'
-                                    : 'border-transparent text-txt-muted hover:text-txt-primary hover:border-border-default'
+                                ? 'border-accent text-accent'
+                                : 'border-transparent text-txt-muted hover:text-txt-primary hover:border-border-default'
                                 }`}
                         >
                             {tab}
@@ -92,57 +93,26 @@ export default function ModelScreen() {
                 </div>
 
                 {/* Data Grid */}
-                <div className="bg-panel rounded-lg border border-border-subtle overflow-x-auto">
-                    <table className="w-full text-[12px] whitespace-nowrap">
-                        <thead>
-                            <tr className="border-b border-border-subtle bg-surface/50">
-                                <th className="text-left px-4 py-3 font-semibold text-txt-secondary uppercase tracking-wider text-[10px] w-64 md:w-80 sticky left-0 bg-surface/95 backdrop-blur-sm z-10 border-r border-border-subtle">
-                                    in $ Millions, Fiscal Year End Dec 31
-                                </th>
-                                <th className="text-right px-4 py-3 font-semibold text-txt-secondary">2021A</th>
-                                <th className="text-right px-4 py-3 font-semibold text-txt-secondary">2022A</th>
-                                <th className="text-right px-4 py-3 font-semibold text-txt-secondary border-l-2 border-accent/30 bg-accent/5">2023E</th>
-                                <th className="text-right px-4 py-3 font-semibold text-txt-secondary bg-accent/5">2024E</th>
-                                <th className="text-right px-4 py-3 font-semibold text-txt-secondary bg-accent/5">2025E</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentData.map((row, idx) => (
-                                <tr
-                                    key={idx}
-                                    className={`
-                                        border-b border-border-subtle/50 
-                                        ${row.isHighlight ? 'bg-surface/30' : 'hover:bg-surface/20'}
-                                        transition-colors
-                                    `}
+                <DataTable headers={['Line Item', '2021A', '2022A', '2023E', '2024E', '2025E']}>
+                    {currentData.map((row, idx) => (
+                        <tr
+                            key={idx}
+                            className={`border-b border-border-subtle/50 ${row.isHighlight ? 'bg-surface/30' : 'hover:bg-surface/20'} transition-colors`}
+                        >
+                            <td className={`px-4 py-2 sticky left-0 bg-panel z-10 border-r border-border-subtle/50 ${row.isHeader ? 'font-semibold text-txt-primary' : 'text-txt-secondary pl-8'}`}>
+                                {row.lineItem}
+                            </td>
+                            {row.values.map((val, vIdx) => (
+                                <td
+                                    key={vIdx}
+                                    className={`px-4 py-2 text-right mono ${vIdx >= 2 ? 'bg-accent/5' : ''} ${vIdx === 2 ? 'border-l-2 border-accent/30' : ''} ${row.isHighlight ? 'font-semibold text-txt-primary' : 'text-cell-input'} ${val < 0 ? 'text-neg-DEFAULT' : ''}`}
                                 >
-                                    <td
-                                        className={`
-                                            px-4 py-2 sticky left-0 bg-panel z-10 border-r border-border-subtle/50
-                                            ${row.isHeader ? 'font-semibold text-txt-primary' : 'text-txt-secondary pl-8'}
-                                        `}
-                                    >
-                                        {row.lineItem}
-                                    </td>
-                                    {row.values.map((val, vIdx) => (
-                                        <td
-                                            key={vIdx}
-                                            className={`
-                                                px-4 py-2 text-right mono
-                                                ${vIdx >= 2 ? 'bg-accent/5' : ''}
-                                                ${vIdx === 2 ? 'border-l-2 border-accent/30' : ''}
-                                                ${row.isHighlight ? 'font-semibold text-txt-primary' : 'text-cell-input'}
-                                                ${val < 0 ? 'text-neg-DEFAULT' : ''}
-                                            `}
-                                        >
-                                            {val < 0 ? `(${Math.abs(val).toFixed(1)})` : val.toFixed(1)}
-                                        </td>
-                                    ))}
-                                </tr>
+                                    {val < 0 ? `(${Math.abs(val).toFixed(1)})` : val.toFixed(1)}
+                                </td>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
+                        </tr>
+                    ))}
+                </DataTable>
             </div>
         </div>
     );

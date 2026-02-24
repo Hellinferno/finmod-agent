@@ -1,13 +1,30 @@
 import { useState } from 'react';
-import { apiClient } from '../api/client';
+import type { AxiosError } from 'axios';
+import { apiClient } from '../services/apiClient';
 import DemoData from '../mocks/dcf-base-case.json';
+import LoadingScreen from '../components/LoadingScreen';
+
+interface DCFResult {
+    status: string;
+    implied_share_price: number;
+    enterprise_value_m?: number;
+    equity_value_m?: number;
+    pv_ufcfs?: number[];
+    pv_terminal_value?: number;
+    warnings?: string[];
+}
+
+interface ApiErrorBody {
+    message?: string;
+    detail?: string | Array<{ msg?: string }>;
+}
 
 export default function DCFScreen() {
     const [wacc, setWacc] = useState<number>(10.5);
     const [tgr, setTgr] = useState<number>(2.5);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [errorStatus, setErrorStatus] = useState<string | null>(null);
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<DCFResult | null>(null);
 
     // Golden Path: Demo Mode Toggle
     const [isDemoMode, setIsDemoMode] = useState<boolean>(
@@ -16,6 +33,10 @@ export default function DCFScreen() {
 
     const handleRunDCF = async () => {
         // 1. Data Validation (Empty / Error States)
+        if (!Number.isFinite(wacc) || !Number.isFinite(tgr)) {
+            setErrorStatus("Validation Error: WACC and TGR must be valid numeric values.");
+            return;
+        }
         if (wacc <= tgr) {
             setErrorStatus("Validation Error: WACC must be strictly greater than Terminal Growth Rate (TGR) for the Gordon Growth Model.");
             return;
@@ -35,10 +56,17 @@ export default function DCFScreen() {
                     wacc_pct: wacc,
                     tgr_pct: tgr
                 });
-                setResult(res);
+                setResult(res as unknown as DCFResult);
             }
-        } catch (err: any) {
-            setErrorStatus(err.response?.data?.message || "Failed to connect to FMVA Agent backend.");
+        } catch (err: unknown) {
+            const apiError = err as AxiosError<ApiErrorBody>;
+            const detail = apiError.response?.data?.detail;
+            const errorMessage = typeof detail === 'string'
+                ? detail
+                : Array.isArray(detail) && detail.length > 0
+                    ? detail[0]?.msg
+                    : apiError.response?.data?.message;
+            setErrorStatus(errorMessage || "Failed to connect to FMVA Agent backend.");
         } finally {
             setIsLoading(false);
         }
@@ -123,19 +151,10 @@ export default function DCFScreen() {
                     {/* OUTPUT PORTION */}
                     <div className="col-span-2">
                         {isLoading ? (
-                            <div className="bg-panel rounded-lg border border-border-subtle p-8 flex flex-col items-center justify-center min-h-[300px]">
-                                <div className="w-8 h-8 rounded-full border-2 border-border-subtle border-t-accent animate-spin mb-4"></div>
-                                <div className="text-[13px] font-semibold text-txt-primary">Computing Present Values</div>
-                                <div className="text-[12px] text-txt-muted mt-1">Calculating Unlevered Free Cash Flows & Terminal Value...</div>
-
-                                <div className="w-full max-w-sm mt-8 space-y-3">
-                                    <div className="h-2 bg-border-subtle rounded w-full overflow-hidden">
-                                        <div className="h-full bg-accent animate-pulse w-2/3"></div>
-                                    </div>
-                                    <div className="h-2 bg-border-subtle rounded w-5/6"></div>
-                                    <div className="h-2 bg-border-subtle rounded w-4/6"></div>
-                                </div>
-                            </div>
+                            <LoadingScreen
+                                title="Computing Present Values"
+                                subtitle="Calculating Unlevered Free Cash Flows & Terminal Value..."
+                            />
                         ) : result ? (
                             <div className="bg-panel rounded-lg border border-border-subtle p-6 min-h-[300px]">
                                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-border-subtle">

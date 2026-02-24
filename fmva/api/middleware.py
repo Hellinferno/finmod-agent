@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 import logging
@@ -11,6 +11,8 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
             return response
+        except HTTPException:
+            raise
         except ValueError as ve:
             # Handle validation errors gracefully
             logger.warning(f"Validation error: {str(ve)}")

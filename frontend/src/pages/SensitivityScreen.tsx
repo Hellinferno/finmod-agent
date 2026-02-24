@@ -1,6 +1,22 @@
 import React, { useState } from 'react';
 
-const mockWaccTgr = {
+interface WaccTgrMatrix {
+    waccRange: number[];
+    tgrRange: number[];
+    baseWacc: number;
+    baseTgr: number;
+    data: number[][];
+}
+
+interface WaccMultipleMatrix {
+    waccRange: number[];
+    multRange: number[];
+    baseWacc: number;
+    baseMult: number;
+    data: number[][];
+}
+
+const mockWaccTgr: WaccTgrMatrix = {
     waccRange: [0.08, 0.09, 0.10, 0.11, 0.12],
     tgrRange: [0.015, 0.020, 0.025, 0.030, 0.035],
     baseWacc: 0.10,
@@ -14,7 +30,7 @@ const mockWaccTgr = {
     ]
 };
 
-const mockWaccMultiple = {
+const mockWaccMultiple: WaccMultipleMatrix = {
     waccRange: [0.08, 0.09, 0.10, 0.11, 0.12],
     multRange: [8.0, 9.0, 10.0, 11.0, 12.0],
     baseWacc: 0.10,
@@ -53,6 +69,7 @@ const getHeatmapColor = (val: number, base: number) => {
 export default function SensitivityScreen() {
     const [activeMatrix, setActiveMatrix] = useState<'tgr' | 'mult'>('tgr');
     const matrix = activeMatrix === 'tgr' ? mockWaccTgr : mockWaccMultiple;
+    const columnValues = activeMatrix === 'tgr' ? mockWaccTgr.tgrRange : mockWaccMultiple.multRange;
     const baseVal = activeMatrix === 'tgr' ? mockWaccTgr.data[2][2] : mockWaccMultiple.data[2][2];
 
     const minPrice = 80; // Hardcoded scaling for viz purposes
@@ -109,7 +126,7 @@ export default function SensitivityScreen() {
                                     <div className="w-16 h-10"></div>
 
                                     {/* Col Headers */}
-                                    {matrix[activeMatrix === 'tgr' ? 'tgrRange' : 'multRange'].map((val, idx) => (
+                                    {columnValues.map((val: number, idx: number) => (
                                         <div key={idx} className="w-20 h-10 flex items-center justify-center text-[13px] font-medium text-txt-secondary bg-surface rounded">
                                             {activeMatrix === 'tgr' ? `${(val * 100).toFixed(1)}%` : `${val.toFixed(1)}x`}
                                         </div>
@@ -131,7 +148,7 @@ export default function SensitivityScreen() {
                                                             ${getHeatmapColor(val, baseVal)}
                                                             ${isBase ? 'ring-2 ring-accent ring-inset font-bold shadow-md z-10' : ''}
                                                         `}
-                                                        title={`WACC: ${(wacc * 100).toFixed(1)}%, ${activeMatrix === 'tgr' ? 'TGR' : 'Mult'}: ${activeMatrix === 'tgr' ? (matrix.tgrRange[cIdx] * 100).toFixed(1) + '%' : matrix.multRange[cIdx] + 'x'}`}
+                                                        title={`WACC: ${(wacc * 100).toFixed(1)}%, ${activeMatrix === 'tgr' ? 'TGR' : 'Mult'}: ${activeMatrix === 'tgr' ? `${(columnValues[cIdx] * 100).toFixed(1)}%` : `${columnValues[cIdx].toFixed(1)}x`}`}
                                                     >
                                                         ${val.toFixed(1)}
                                                     </div>

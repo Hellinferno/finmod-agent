@@ -3,14 +3,14 @@ Sensitivity analysis engine — 2D matrices and football field visualization.
 """
 
 from __future__ import annotations
-from typing import Optional, Callable
-import numpy as np
+from typing import Callable
+
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from loguru import logger
-from fmva.audit.trail import AuditTrail, NullAudit
-from fmva.core.schemas import SensitivityOutput
+from fmva.audit.trail import AuditTrail
 
 
 def sensitivity_matrix(
@@ -63,6 +63,7 @@ def wacc_tgr_sensitivity(
     base_ufcf: float, base_sum_pv: float, net_debt: float,
     shares: float, n_years: int, mid_year: bool = True,
     wacc_range: list[float] = None, tgr_range: list[float] = None,
+    base_wacc: float | None = None,
     audit: AuditTrail = None,
 ) -> dict:
     """Build WACC × Terminal Growth Rate sensitivity matrix for implied share price."""
@@ -70,6 +71,18 @@ def wacc_tgr_sensitivity(
         wacc_range = [0.08, 0.09, 0.10, 0.11, 0.12]
     if tgr_range is None:
         tgr_range = [0.015, 0.020, 0.025, 0.030, 0.035]
+    if base_wacc is None:
+        base_wacc = wacc_range[len(wacc_range) // 2]
+
+    def _discount_sum(wacc: float) -> float:
+        return sum(
+            1.0 / ((1.0 + wacc) ** (t - 0.5 if mid_year else float(t)))
+            for t in range(1, n_years + 1)
+        )
+
+    # Infer an annual UFCF proxy from the base case so stage-period PV also responds to WACC.
+    base_discount_sum = _discount_sum(base_wacc)
+    ufcf_proxy = (base_sum_pv / base_discount_sum) if base_discount_sum else 0.0
 
     def _compute(wacc, tgr):
         if wacc <= tgr:
@@ -77,8 +90,8 @@ def wacc_tgr_sensitivity(
         tv = base_ufcf * (1 + tgr) / (wacc - tgr)
         exp = n_years - 0.5 if mid_year else float(n_years)
         pv_tv = tv / ((1 + wacc) ** exp)
-        # Recalculate PV of UFCFs at this WACC
-        ev = base_sum_pv + pv_tv  # Simplified — uses base_sum_pv as proxy
+        stage_pv = ufcf_proxy * _discount_sum(wacc)
+        ev = stage_pv + pv_tv
         eq = ev - net_debt
         return eq / shares if shares else None
 

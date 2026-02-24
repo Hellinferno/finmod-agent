@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import Dashboard from './pages/Dashboard';
+import DashboardScreen from './pages/DashboardScreen';
 import DCFScreen from './pages/DCFScreen';
 import IngestionScreen from './pages/IngestionScreen';
 import AssumptionsScreen from './pages/AssumptionsScreen';
@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<DashboardScreen />} />
           <Route path="/dcf" element={<DCFScreen />} />
           <Route path="/ingest" element={<IngestionScreen />} />
           <Route path="/assumptions" element={<AssumptionsScreen />} />
