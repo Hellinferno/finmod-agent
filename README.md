@@ -113,27 +113,43 @@ fmva/
 
 ---
 
-## 🎨 UI Prototype
+## 🎨 Interactive React Frontend
 
-The `UI/` folder contains a **9-page static HTML prototype** — a fully navigable, industry-grade financial modeling interface built with Tailwind CSS.
+The `frontend/` folder contains a **fully functional, interactive React application** — an industry-grade financial modeling interface built with Vite, React, Tailwind CSS, and Recharts.
 
 **Brand Identity:** White + Black + Light Blue — clean, minimalist, high-contrast.
 
-| Page | File | Status |
+| Page | Component | Status |
 |------|------|--------|
-| **Dashboard** | `fmva-dashboard.html` | ✅ Live |
-| **Data Ingestion** | `fmva-ingestion-screen.html` | ✅ Live |
-| **Assumptions Engine** | `fmva-assumptions-components.html` | ✅ Live |
-| **DCF Valuation** | `fmva-dcf-screen.html` | ✅ Live |
-| **3-Statement Model** | `fmva-model.html` | 🔵 Coming Soon |
-| **Trading Comps** | `fmva-comps.html` | 🔵 Coming Soon |
-| **Sensitivity Analysis** | `fmva-sensitivity.html` | 🔵 Coming Soon |
-| **Audit Trail** | `fmva-audit.html` | 🔵 Coming Soon |
-| **Export Center** | `fmva-export.html` | 🔵 Coming Soon |
+| **Dashboard** | `DashboardScreen.tsx` | ✅ Live |
+| **Data Ingestion** | `IngestionScreen.tsx` | ✅ Live |
+| **Assumptions Engine** | `AssumptionsScreen.tsx` | ✅ Live |
+| **DCF Valuation** | `DCFScreen.tsx` | ✅ Live |
+| **3-Statement Model** | `ModelScreen.tsx` | ✅ Live |
+| **Trading Comps** | `CompsScreen.tsx` | ✅ Live |
+| **Sensitivity Analysis** | `SensitivityScreen.tsx` | ✅ Live |
+| **Audit Trail** | `AuditScreen.tsx` | ✅ Live |
+| **Export Center** | `ExportScreen.tsx` | ✅ Live |
 
-> Open `UI/fmva-dashboard.html` in any browser to explore. All pages are cross-linked via sidebar navigation.
+### Running the Application
 
-See [`UI/fmva-design-spec.md`](UI/fmva-design-spec.md) for full design token tables, typography scale, and component specifications.
+**1. Start the FastAPI Backend**
+```bash
+cd fmva
+# Ensure you are in the virtual environment
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**2. Start the Vite Frontend**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+> The application will be available at `http://localhost:5173`. It connects to the FastAPI backend at `http://localhost:8000` for real-time financial modeling capabilities.
+
+See [`ENV_SETUP.md`](ENV_SETUP.md) and [`INTEGRATION_GUIDE.md`](INTEGRATION_GUIDE.md) for full setup instructions.
 
 ---
 
