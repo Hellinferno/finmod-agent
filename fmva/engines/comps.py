@@ -1,5 +1,5 @@
 """
-Comparable company analysis engine — fetch data via yfinance, compute multiples & stats.
+Comparable company analysis engine - fetch data via yfinance, compute multiples & stats.
 """
 
 from __future__ import annotations

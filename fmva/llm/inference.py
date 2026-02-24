@@ -1,5 +1,5 @@
 """
-LLM narrative generator — produces per-section narratives with hallucination guard.
+LLM narrative generator - produces per-section narratives with hallucination guard.
 """
 
 from __future__ import annotations

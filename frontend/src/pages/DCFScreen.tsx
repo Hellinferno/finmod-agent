@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { AxiosError } from 'axios';
-import { apiClient } from '../services/apiClient';
+import { postFromApi } from '../services/apiClient';
 import DemoData from '../mocks/dcf-base-case.json';
 import LoadingScreen from '../components/LoadingScreen';
 
@@ -51,12 +51,12 @@ export default function DCFScreen() {
                 setResult(DemoData);
             } else {
                 // Live Mode Data flow to FastAPI backend
-                const res = await apiClient.post('/api/dcf/run', {
+                const res = await postFromApi<DCFResult>('/api/dcf/run', {
                     company_id: 'TECH',
                     wacc_pct: wacc,
                     tgr_pct: tgr
                 });
-                setResult(res as unknown as DCFResult);
+                setResult(res);
             }
         } catch (err: unknown) {
             const apiError = err as AxiosError<ApiErrorBody>;

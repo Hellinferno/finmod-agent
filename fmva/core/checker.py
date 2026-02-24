@@ -43,7 +43,7 @@ def check_balance_sheet(
             year=bs.year,
         )
 
-    # ── Imbalanced — build plug suggestion ─────────────────────────────────
+    # ── Imbalanced - build plug suggestion ─────────────────────────────────
     if delta > 0:
         # Assets exceed L+E
         suggestion = (
@@ -60,7 +60,7 @@ def check_balance_sheet(
         )
 
     logger.error(
-        f"Year {bs.year}: Balance sheet IMBALANCED — "
+        f"Year {bs.year}: Balance sheet IMBALANCED - "
         f"Assets=${bs.total_assets:,.1f}M, L+E=${bs.total_liabilities + bs.shareholders_equity:,.1f}M, "
         f"Delta=${delta:,.2f}M"
     )

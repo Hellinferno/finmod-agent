@@ -1,5 +1,5 @@
 """
-DCF valuation engine — terminal value, discounting, enterprise value, equity bridge.
+DCF valuation engine - terminal value, discounting, enterprise value, equity bridge.
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 """
-Assumption engine — manages Bear/Base/Bull scenario presets and custom assumptions.
+Assumption engine - manages Bear/Base/Bull scenario presets and custom assumptions.
 
 Handles:
 - Default scenario presets with industry-standard values

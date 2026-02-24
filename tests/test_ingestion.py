@@ -3,7 +3,7 @@
 import json
 import pytest
 from pathlib import Path
-from fmva.core.ingestion import load_json
+from fmva.core.ingestion import load_json, load_pdf
 from fmva.core.normalization import normalize
 from fmva.core.validation import validate
 from fmva.core.checker import check_balance_sheet, check_all_balance_sheets
@@ -26,6 +26,34 @@ class TestLoadJson:
         bad.write_text(json.dumps({"foo": "bar"}))
         with pytest.raises(Exception):
             load_json(str(bad))
+
+    def test_load_pdf_basic(self, tmp_path):
+        pytest.importorskip("pdfplumber")
+        from reportlab.pdfgen import canvas
+
+        pdf_path = tmp_path / "simple_fs.pdf"
+        c = canvas.Canvas(str(pdf_path))
+        c.setFont("Helvetica", 11)
+        c.drawString(72, 800, "TechCorp Inc.")
+        c.drawString(72, 780, "Income Statement")
+        c.drawString(72, 762, "2023 2022")
+        c.drawString(72, 744, "Revenue 500 450")
+        c.drawString(72, 726, "EBITDA 125 110")
+        c.drawString(72, 700, "Balance Sheet")
+        c.drawString(72, 682, "2023 2022")
+        c.drawString(72, 664, "Total Assets 750 700")
+        c.drawString(72, 646, "Total Liabilities 325 300")
+        c.drawString(72, 620, "Cash Flow Statement")
+        c.drawString(72, 602, "2023 2022")
+        c.drawString(72, 584, "Operating Cash Flow 140 130")
+        c.save()
+
+        data = load_pdf(str(pdf_path))
+        assert data["company_name"] == "TechCorp Inc."
+        assert "2023" in data["income_statement"]
+        assert "2023" in data["balance_sheet"]
+        assert "2023" in data["cash_flow_statement"]
+        assert data["income_statement"]["2023"]["Revenue"] == 500.0
 
 
 class TestNormalization:

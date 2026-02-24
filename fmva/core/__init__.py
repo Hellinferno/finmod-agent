@@ -1,4 +1,4 @@
-"""FMVA Core module — Data ingestion, normalization, validation, and schemas."""
+"""FMVA Core module - Data ingestion, normalization, validation, and schemas."""
 
 from fmva.core.schemas import (
     IncomeStatement,

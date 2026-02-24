@@ -1,5 +1,5 @@
 """
-WACC calculator — CAPM-based with yfinance beta fetch and bounds validation.
+WACC calculator - CAPM-based with yfinance beta fetch and bounds validation.
 """
 
 from __future__ import annotations

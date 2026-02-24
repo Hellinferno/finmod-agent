@@ -17,3 +17,8 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+export async function postFromApi<T>(url: string, payload: unknown): Promise<T> {
+    const data = await apiClient.post(url, payload);
+    return data as T;
+}

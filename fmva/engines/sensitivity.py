@@ -1,5 +1,5 @@
 """
-Sensitivity analysis engine — 2D matrices and football field visualization.
+Sensitivity analysis engine - 2D matrices and football field visualization.
 """
 
 from __future__ import annotations
@@ -148,7 +148,7 @@ def plot_football_field(
     # Add value labels
     for bar, low, width in zip(bars, lows, widths):
         ax.text(low + width / 2, bar.get_y() + bar.get_height() / 2,
-                f"${low:,.0f} — ${low + width:,.0f}", ha="center", va="center",
+                f"${low:,.0f} - ${low + width:,.0f}", ha="center", va="center",
                 fontsize=10, fontweight="bold", color="white")
 
     if current_price is not None:

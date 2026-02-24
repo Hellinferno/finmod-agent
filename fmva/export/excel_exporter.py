@@ -1,5 +1,5 @@
 """
-Excel export engine — generates 10-sheet valuation workbook with formatting.
+Excel export engine - generates 10-sheet valuation workbook with formatting.
 """
 
 from __future__ import annotations

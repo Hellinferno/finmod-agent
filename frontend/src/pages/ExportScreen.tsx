@@ -17,6 +17,19 @@ Trading multiples of 5 peer companies indicate a median EV/EBITDA of 43.1x. Appl
     isVerified: true
 };
 
+function renderParagraphWithBold(paragraph: string) {
+    return paragraph.split(/(\*\*.*?\*\*)/g).map((segment, index) => {
+        if (segment.startsWith('**') && segment.endsWith('**')) {
+            return (
+                <strong key={index} className="text-txt-primary font-semibold">
+                    {segment.slice(2, -2)}
+                </strong>
+            );
+        }
+        return <span key={index}>{segment}</span>;
+    });
+}
+
 export default function ExportScreen() {
     const [isExporting, setIsExporting] = useState<{ [key: string]: boolean }>({});
 
@@ -139,9 +152,7 @@ export default function ExportScreen() {
 
                     <div className="p-6 text-[13px] text-txt-secondary leading-relaxed space-y-4">
                         {mockNarrative.content.split('\n\n').map((paragraph, idx) => (
-                            <p key={idx} dangerouslySetInnerHTML={{
-                                __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong class="text-txt-primary font-semibold">$1</strong>')
-                            }} />
+                            <p key={idx}>{renderParagraphWithBold(paragraph)}</p>
                         ))}
                     </div>
 

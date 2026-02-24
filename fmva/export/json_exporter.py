@@ -1,5 +1,5 @@
 """
-JSON export engine — structured JSON output with all valuation data.
+JSON export engine - structured JSON output with all valuation data.
 """
 
 from __future__ import annotations

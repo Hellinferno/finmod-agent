@@ -50,7 +50,7 @@ def configure_logging(
         format=(
             "<green>{time:HH:mm:ss}</green> | "
             "<level>{level: <8}</level> | "
-            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> — "
+            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
             "<level>{message}</level>"
         ),
         level=console_level,
@@ -63,7 +63,7 @@ def configure_logging(
         format=(
             "{time:YYYY-MM-DD HH:mm:ss.SSS} | "
             "{level: <8} | "
-            "{name}:{function}:{line} — {message}"
+            "{name}:{function}:{line} - {message}"
         ),
         level=file_level,
         rotation="50 MB",

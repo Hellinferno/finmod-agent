@@ -1,1 +1,1 @@
-"""FMVA Audit module — Immutable computation audit trail."""
+"""FMVA Audit module - Immutable computation audit trail."""

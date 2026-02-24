@@ -1,1 +1,1 @@
-"""FMVA Export module — Excel, JSON, and PDF output generation."""
+"""FMVA Export module - Excel, JSON, and PDF output generation."""

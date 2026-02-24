@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fmva.api.routes import dcf, assumptions
+from fmva.api.routes import dcf, assumptions, ingestion
 from fmva.api.middleware import ErrorHandlingMiddleware
 
 app = FastAPI(
@@ -29,6 +29,7 @@ app.add_middleware(ErrorHandlingMiddleware)
 # Include routers
 app.include_router(dcf.router, prefix="/api/dcf", tags=["DCF Valuation"])
 app.include_router(assumptions.router, prefix="/api/assumptions", tags=["Assumptions"])
+app.include_router(ingestion.router, prefix="/api/ingestion", tags=["Data Ingestion"])
 
 @app.get("/api/health")
 async def health_check():

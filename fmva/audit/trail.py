@@ -2,7 +2,7 @@
 Immutable audit trail engine.
 
 Records every computation step with formula, inputs, output, and timestamp.
-Entries are frozen dataclasses — append-only, never modified.
+Entries are frozen dataclasses - append-only, never modified.
 """
 
 from __future__ import annotations

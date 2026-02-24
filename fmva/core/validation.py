@@ -2,7 +2,7 @@
 Financial data validation module.
 
 Checks normalized data for internal consistency and reasonableness.
-All checks produce warnings or errors — never silently modifies data.
+All checks produce warnings or errors - never silently modifies data.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ def validate(fs: FinancialStatements) -> ValidationReport:
             # Check 1: Revenue must be non-negative
             if is_stmt.revenue is not None and is_stmt.revenue < 0:
                 errors.append(
-                    f"Year {year}: Negative revenue (${is_stmt.revenue:.1f}M) — "
+                    f"Year {year}: Negative revenue (${is_stmt.revenue:.1f}M) - "
                     f"this is invalid for most companies."
                 )
 
@@ -90,9 +90,9 @@ def validate(fs: FinancialStatements) -> ValidationReport:
             logger.warning(f"Validation warning: {w}")
 
     if passed:
-        logger.info("Validation passed — all integrity checks OK")
+        logger.info("Validation passed - all integrity checks OK")
     else:
-        logger.error(f"Validation failed — {len(errors)} error(s)")
+        logger.error(f"Validation failed - {len(errors)} error(s)")
 
     return ValidationReport(
         passed=passed,

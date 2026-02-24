@@ -1,4 +1,52 @@
+import { useState, useRef } from 'react';
+import { apiClient } from '../services/apiClient';
+
+interface UploadResponse {
+    metadata: any;
+    income_statements: any;
+    balance_sheets: any;
+    cash_flows: any;
+    warnings: any;
+}
+
 export default function IngestionScreen() {
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+    const [financialData, setFinancialData] = useState<UploadResponse | null>(null);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        setUploadError(null);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const data = await apiClient.post<UploadResponse>('/api/ingestion/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setFinancialData(data);
+            setUploadedFile(file.name);
+        } catch (err: any) {
+            setUploadError(err.response?.data?.detail || err.message || 'Upload failed');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
     return (
         <div className="flex-1 overflow-y-auto bg-base h-full">
             {/* PAGE HEADER */}
@@ -84,68 +132,75 @@ export default function IngestionScreen() {
                 {/* File Upload Zone */}
                 <div className="grid grid-cols-3 gap-4">
 
-                    {/* Income Statement Upload */}
+                    {/* Hidden File Input */}
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept=".json,.csv,.xlsx,.xls,.pdf"
+                        onChange={handleFileChange}
+                    />
+
+                    {/* Quick Upload Action */}
                     <div
-                        className="bg-panel rounded-lg border-2 border-dashed border-border-default hover:border-accent transition-colors cursor-pointer group">
+                        onClick={handleUploadClick}
+                        className={`bg-panel rounded-lg border-2 border-dashed ${isUploading ? 'border-accent opacity-50' : 'border-border-default hover:border-accent'} transition-colors cursor-pointer group`}>
                         <div className="p-6 text-center">
                             <div
                                 className="w-12 h-12 rounded-lg bg-surface border border-border-subtle flex items-center justify-center mx-auto mb-3 group-hover:border-accent/50 transition-colors">
-                                <svg className="w-6 h-6 text-txt-muted group-hover:text-accent transition-colors" fill="none"
+                                <svg className={`w-6 h-6 ${isUploading ? 'text-accent animate-spin' : 'text-txt-muted group-hover:text-accent'} transition-colors`} fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
-                                        d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                                        d={isUploading ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" : "M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"} />
                                 </svg>
                             </div>
-                            <div className="text-[13px] font-semibold text-txt-primary mb-1">Income Statement</div>
-                            <div className="text-[11px] text-txt-muted mb-3">Revenue · EBITDA · Net Income<br />Min. 3 historical years</div>
+                            <div className="text-[13px] font-semibold text-txt-primary mb-1">Financial Statements</div>
+                            <div className="text-[11px] text-txt-muted mb-3">Upload your raw JSON, CSV, Excel, or PDF file<br />Contains IS, BS, and CF data</div>
                             <div
                                 className="px-3 py-1.5 rounded bg-surface border border-border-default text-[11px] text-txt-secondary inline-block group-hover:bg-elevated transition-colors">
-                                Drop file or click to browse
+                                {isUploading ? 'Uploading & Processing...' : 'Drop file or click to browse'}
                             </div>
                         </div>
                     </div>
 
-                    {/* Balance Sheet Upload — Uploaded State */}
-                    <div className="bg-panel rounded-lg border-2 border-pos-DEFAULT bg-pos-bg/20">
-                        <div className="p-6 text-center">
-                            <div
-                                className="w-12 h-12 rounded-lg bg-pos-bg border border-pos-DEFAULT flex items-center justify-center mx-auto mb-3">
-                                <svg className="w-6 h-6 text-pos-DEFAULT" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <div className="text-[13px] font-semibold text-txt-primary mb-0.5">Balance Sheet</div>
-                            <div className="mono text-[11px] text-pos-text mb-1">techcorp_bs.csv</div>
-                            <div className="text-[10px] text-txt-muted mb-3">3 periods · 24 line items · USD $M</div>
-                            <div className="flex items-center justify-center gap-2">
-                                <span
-                                    className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[10px] font-medium">✓
-                                    BS BALANCED</span>
-                                <button className="text-[10px] text-txt-muted hover:text-neg-text transition-colors">Remove</button>
+                    {/* Upload Status State */}
+                    {uploadedFile ? (
+                        <div className="bg-panel rounded-lg border-2 border-pos-DEFAULT bg-pos-bg/20">
+                            <div className="p-6 text-center">
+                                <div
+                                    className="w-12 h-12 rounded-lg bg-pos-bg border border-pos-DEFAULT flex items-center justify-center mx-auto mb-3">
+                                    <svg className="w-6 h-6 text-pos-DEFAULT" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div className="text-[13px] font-semibold text-txt-primary mb-0.5">Ingestion Successful</div>
+                                <div className="mono text-[11px] text-pos-text mb-1">{uploadedFile}</div>
+                                <div className="text-[10px] text-txt-muted mb-3">Data successfully normalized</div>
+                                <div className="flex items-center justify-center gap-2">
+                                    <span
+                                        className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[10px] font-medium">✓
+                                        READY</span>
+                                    <button onClick={() => { setUploadedFile(null); setFinancialData(null); }} className="text-[10px] text-txt-muted hover:text-neg-text transition-colors">Remove</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
 
-                    {/* Cash Flow Upload — Error State */}
-                    <div
-                        className="bg-panel rounded-lg border-2 border-dashed border-border-default hover:border-accent transition-colors cursor-pointer group">
-                        <div className="p-6 text-center">
-                            <div
-                                className="w-12 h-12 rounded-lg bg-surface border border-border-subtle flex items-center justify-center mx-auto mb-3 group-hover:border-accent/50 transition-colors">
-                                <svg className="w-6 h-6 text-txt-muted group-hover:text-accent transition-colors" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div className="text-[13px] font-semibold text-txt-primary mb-1">Cash Flow Statement</div>
-                            <div className="text-[11px] text-txt-muted mb-3">Operating · Investing · Financing<br />Required for UFCF calculation</div>
-                            <div
-                                className="px-3 py-1.5 rounded bg-surface border border-border-default text-[11px] text-txt-secondary inline-block group-hover:bg-elevated transition-colors">
-                                Drop file or click to browse
-                            </div>
+                        <div className="bg-panel rounded-lg border border-border-default opacity-50 flex items-center justify-center">
+                            <div className="text-[11px] text-txt-muted">Awaiting Upload...</div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* Error State */}
+                    {uploadError && (
+                        <div className="bg-panel rounded-lg border-2 border-neg-DEFAULT bg-neg-bg/20 flex flex-col items-center justify-center p-6 text-center">
+                            <svg className="w-8 h-8 text-neg-DEFAULT mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div className="text-[12px] font-semibold text-neg-DEFAULT">Upload Failed</div>
+                            <div className="text-[11px] text-neg-text max-w-[200px] mt-1">{uploadError}</div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Normalization Preview Table */}
@@ -177,65 +232,33 @@ export default function IngestionScreen() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
-                                    <td className="px-4 py-2 mono text-txt-secondary">Total Revenue</td>
-                                    <td className="px-4 py-2 mono text-cell-input">total_revenue</td>
-                                    <td className="px-4 py-2"><span
-                                        className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[9px]">✓ Auto-mapped</span></td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">413.2</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">454.5</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">500.0</td>
-                                </tr>
-                                <tr className="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
-                                    <td className="px-4 py-2 mono text-txt-secondary">Gross Profit</td>
-                                    <td className="px-4 py-2 mono text-cell-input">gross_profit</td>
-                                    <td className="px-4 py-2"><span
-                                        className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[9px]">✓ Auto-mapped</span></td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">289.2</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">318.2</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">350.0</td>
-                                </tr>
-                                <tr className="border-b border-border-subtle/50 bg-warn-bg/30">
-                                    <td className="px-4 py-2 mono text-warn-DEFAULT">Operating EBITDA</td>
-                                    <td className="px-4 py-2">
-                                        <select
-                                            className="bg-surface border border-warn-DEFAULT rounded px-2 py-1 mono text-[10px] text-warn-DEFAULT focus:outline-none">
-                                            <option>ebitda</option>
-                                            <option>ebit</option>
-                                            <option>gross_profit</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-4 py-2"><span
-                                        className="px-2 py-0.5 rounded-full bg-warn-bg border border-warn-DEFAULT text-warn-DEFAULT text-[9px]">⚠ Review</span></td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">99.2</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">109.1</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">125.0</td>
-                                </tr>
-                                <tr className="border-b border-border-subtle/50 bg-warn-bg/30">
-                                    <td className="px-4 py-2 mono text-warn-DEFAULT">Depr. & Amort.</td>
-                                    <td className="px-4 py-2">
-                                        <select
-                                            className="bg-surface border border-warn-DEFAULT rounded px-2 py-1 mono text-[10px] text-warn-DEFAULT focus:outline-none">
-                                            <option>depreciation_and_amortization</option>
-                                            <option>da</option>
-                                            <option>capex</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-4 py-2"><span
-                                        className="px-2 py-0.5 rounded-full bg-warn-bg border border-warn-DEFAULT text-warn-DEFAULT text-[9px]">⚠ Review</span></td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">18.5</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">22.0</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">25.0</td>
-                                </tr>
-                                <tr className="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
-                                    <td className="px-4 py-2 mono text-txt-secondary">Net Income</td>
-                                    <td className="px-4 py-2 mono text-cell-input">net_income</td>
-                                    <td className="px-4 py-2"><span
-                                        className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[9px]">✓ Auto-mapped</span></td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">57.3</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">62.9</td>
-                                    <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">71.0</td>
-                                </tr>
+                                {financialData && Object.keys(financialData.income_statements).length > 0 ? (
+                                    Object.keys(financialData.income_statements[Math.max(...Object.keys(financialData.income_statements).map(Number))] || {}).slice(0, 5).map((key) => {
+                                        const years = Object.keys(financialData.income_statements).map(Number).sort();
+                                        return (
+                                            <tr key={key} className="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                                                <td className="px-4 py-2 mono text-txt-secondary">{key}</td>
+                                                <td className="px-4 py-2 mono text-cell-input whitespace-nowrap">{key}</td>
+                                                <td className="px-4 py-2"><span className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[9px] whitespace-nowrap">✓ Auto-mapped</span></td>
+                                                {years.map(y => (
+                                                    <td key={y} className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">
+                                                        {financialData.income_statements[y][key] !== null ? financialData.income_statements[y][key].toFixed(1) : '-'}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr className="border-b border-border-subtle/50 hover:bg-surface/40 transition-colors">
+                                        <td className="px-4 py-2 mono text-txt-secondary">Total Revenue</td>
+                                        <td className="px-4 py-2 mono text-cell-input">total_revenue</td>
+                                        <td className="px-4 py-2"><span
+                                            className="px-2 py-0.5 rounded-full bg-pos-bg border border-pos-DEFAULT text-pos-text text-[9px]">✓ Auto-mapped</span></td>
+                                        <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">-</td>
+                                        <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">-</td>
+                                        <td className="px-4 py-2 font-mono text-[12px] text-right text-cell-formula">-</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -301,7 +324,6 @@ export default function IngestionScreen() {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );

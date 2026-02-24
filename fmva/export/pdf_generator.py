@@ -21,7 +21,7 @@ def generate_pdf(
         from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
         from reportlab.lib.units import inch
     except ImportError:
-        logger.warning("reportlab not available — PDF export skipped")
+        logger.warning("reportlab not available - PDF export skipped")
         return ""
 
     path = Path(filepath)
@@ -35,7 +35,7 @@ def generate_pdf(
     body_style = styles["BodyText"]
 
     story = []
-    story.append(Paragraph(f"Valuation Report — {company_name}", title_style))
+    story.append(Paragraph(f"Valuation Report - {company_name}", title_style))
     story.append(Spacer(1, 0.2*inch))
 
     if dcf_summary:

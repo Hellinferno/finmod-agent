@@ -1,5 +1,5 @@
 """
-LLM model loader — Unsloth/HuggingFace model with 4-bit quantization.
+LLM model loader - Unsloth/HuggingFace model with 4-bit quantization.
 """
 
 from __future__ import annotations

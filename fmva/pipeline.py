@@ -1,5 +1,5 @@
 """
-Pipeline orchestrator — single entry point for the full FMVA pipeline.
+Pipeline orchestrator - single entry point for the full FMVA pipeline.
 
 run_full_pipeline(): ingest → normalize → validate → DCF → export
 """
