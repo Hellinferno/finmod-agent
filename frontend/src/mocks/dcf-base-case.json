@@ -1,0 +1,18 @@
+{
+    "status": "success",
+    "implied_share_price": 9.52,
+    "enterprise_value_m": 1102,
+    "equity_value_m": 952,
+    "wacc_pct": 10.5,
+    "tgr_pct": 2.5,
+    "warnings": [],
+    "audit_trail_id": "audit_TECH_dcf",
+    "pv_ufcfs": [
+        105.2,
+        112.4,
+        120.8,
+        126.5,
+        132.1
+    ],
+    "pv_terminal_value": 505.0
+}

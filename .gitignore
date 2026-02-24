@@ -54,3 +54,9 @@ notebooks/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Temporary/Local files
+.venv_old/
+UI.zip
+test_output.txt
+test_results.txt
