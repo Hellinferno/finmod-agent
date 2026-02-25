@@ -4,6 +4,7 @@ import json
 import pytest
 from pathlib import Path
 from fmva.core.ingestion import load_json, load_pdf
+import fmva.core.normalization as normalization
 from fmva.core.normalization import normalize
 from fmva.core.validation import validate
 from fmva.core.checker import check_balance_sheet, check_all_balance_sheets
@@ -86,10 +87,66 @@ class TestNormalization:
         assert bs.total_liabilities == 325.0
         assert bs.shareholders_equity == 425.0
 
+    def test_normalize_year_dict_with_row_lists(self):
+        raw = {
+            "company_name": "ListCo",
+            "income_statement": {
+                "2023": [
+                    {"line_item": "Total Revenue", "value": 500},
+                    {"line_item": "EBITDA", "value": 120},
+                ],
+                "2022": [
+                    {"line_item": "Total Revenue", "value": 450},
+                    {"line_item": "EBITDA", "value": 110},
+                ],
+                "2021": [
+                    {"line_item": "Total Revenue", "value": 400},
+                    {"line_item": "EBITDA", "value": 100},
+                ],
+            },
+            "balance_sheet": {
+                "2023": [
+                    {"line_item": "Total Assets", "value": 750},
+                    {"line_item": "Total Liabilities", "value": 325},
+                    {"line_item": "Total Equity", "value": 425},
+                ],
+                "2022": [
+                    {"line_item": "Total Assets", "value": 700},
+                    {"line_item": "Total Liabilities", "value": 300},
+                    {"line_item": "Total Equity", "value": 400},
+                ],
+                "2021": [
+                    {"line_item": "Total Assets", "value": 650},
+                    {"line_item": "Total Liabilities", "value": 280},
+                    {"line_item": "Total Equity", "value": 370},
+                ],
+            },
+            "cash_flow_statement": {
+                "2023": [{"line_item": "Operating Cash Flow", "value": 140}],
+                "2022": [{"line_item": "Operating Cash Flow", "value": 130}],
+                "2021": [{"line_item": "Operating Cash Flow", "value": 120}],
+            },
+        }
+
+        fs = normalize(raw)
+        assert fs.metadata.company_name == "ListCo"
+        assert fs.income_statements[2023].revenue == 500.0
+        assert fs.income_statements[2023].ebitda == 120.0
+        assert fs.balance_sheets[2023].total_assets == 750.0
+        assert fs.cash_flows[2023].operating_cash_flow == 140.0
+
     def test_historical_years(self, techcorp_raw):
         fs = normalize(techcorp_raw)
         assert fs.historical_years == [2021, 2022, 2023]
         assert fs.latest_year == 2023
+
+    def test_map_statement_fields_handles_non_dict_field_map(self):
+        mapped = normalization._map_statement_fields(
+            {"Total Revenue": 500.0},
+            [],
+            year=2023,
+        )
+        assert mapped == {}
 
 
 class TestValidation:
